@@ -1,0 +1,32 @@
+name: Install Basement Control Center
+
+on:
+  push:
+    paths:
+      - ".github/workflows/unpack.yml"
+      - "Basement-Control-Center-*.zip"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Extract website
+        run: |
+          ZIP_FILE=$(find . -maxdepth 1 -name "Basement-Control-Center-*.zip" -print -quit)
+          test -n "$ZIP_FILE"
+          unzip -o "$ZIP_FILE" -d .
+
+      - name: Save website files
+        run: |
+          git config user.name "Basement Installer"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Install Basement Control Center V2" || exit 0
+          git push
