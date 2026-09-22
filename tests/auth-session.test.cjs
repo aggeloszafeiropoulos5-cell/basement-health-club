@@ -157,7 +157,7 @@ test('upstream outage is not falsely reported as an expired session', async () =
 
 test('ordinary members cannot reach user creation even with a valid session', async () => {
   let calls = 0;
-  global.fetch = async () => { calls++; return calls === 1 ? json({ id: 'member' }) : json([{ role: 'member' }]); };
+  global.fetch = async () => { calls++; return calls === 1 ? json({ id: 'member' }) : json([{ role: 'customer' }]); };
   const result = await route().POST(request());
   assert.equal(result.status, 403);
   assert.equal(calls, 2);
@@ -171,3 +171,44 @@ test('invalid server key does not cause a session refresh loop', async () => {
   assert.equal((await result.json()).code, 'SERVER_KEY_REJECTED');
   assert.equal(calls, 3);
 });
+
+function successfulOwnerBeforeProfile(profileResponse) {
+  const calls = [];
+  global.fetch = async (url, init) => {
+    calls.push({ url, init });
+    if (calls.length === 1) return json({ id: 'owner' });
+    if (calls.length === 2) return json([{ role: 'owner' }]);
+    if (calls.length === 3) return json({ id: 'new-customer' });
+    assert.equal(calls.length, 4, 'no repeated account creation');
+    assert.equal(init.method, 'PATCH');
+    assert.equal(JSON.parse(init.body).role, 'customer');
+    assert.equal(new Headers(init.headers).get('Prefer'), 'return=representation');
+    return typeof profileResponse === 'function' ? profileResponse() : profileResponse;
+  };
+  return calls;
+}
+
+test('member creation uses the supported customer role and returns the saved profile', async () => {
+  const calls = successfulOwnerBeforeProfile(json([{ id: 'new-customer', full_name: 'Test Member', role: 'customer' }]));
+  const result = await route().POST(request());
+  assert.equal(result.status, 200);
+  assert.deepEqual(await result.json(), { id: 'new-customer', full_name: 'Test Member', role: 'customer' });
+  assert.equal(calls.length, 4);
+});
+
+for (const [name, response] of [
+  ['profile update rejects the role', () => json({ code: '22P02' }, 400)],
+  ['profile trigger created no matching row', () => json([])],
+  ['profile has an unexpected role', () => json([{ id: 'new-customer', full_name: 'Test Member', role: 'owner' }])],
+  ['profile save loses its network response', () => { throw new TypeError('fetch failed'); }],
+]) {
+  test(`${name}: no false success and no automatic account retry`, async () => {
+    const calls = successfulOwnerBeforeProfile(response);
+    const result = await route().POST(request());
+    assert.equal(result.status, 502);
+    const data = await result.json();
+    assert.equal(data.code, 'MEMBER_PROFILE_FAILED');
+    assert.equal(data.account_created, true);
+    assert.equal(calls.length, 4);
+  });
+}

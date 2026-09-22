@@ -71,7 +71,7 @@ begin
   if v_target <> v_actor and coalesce(v_role,'') not in ('owner','admin') then
     raise exception 'Δεν επιτρέπεται κράτηση για άλλο μέλος.';
   end if;
-  if not exists (select 1 from public.profiles where id = v_target and role = 'member') then
+  if not exists (select 1 from public.profiles where id = v_target and role = 'customer') then
     raise exception 'Δεν βρέθηκε ενεργό μέλος.';
   end if;
   select * into v_slot from public.basement_slots where id = p_slot_id for update;

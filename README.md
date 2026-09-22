@@ -18,3 +18,16 @@ Member creation is performed only by the owner through a protected server route.
 Access tokens refresh before expiry and after an explicit authentication rejection. Parallel refreshes share one request; browsers with Web Locks also coordinate tabs. Transient service errors preserve the saved session. Opening `/login` always allows a fresh sign-in. The owner-only member endpoint reports upstream authentication failures separately from expired sessions and rejected server keys. Member creation is retried only after an explicit pre-creation session rejection.
 
 Validation: `node --test tests/auth-session.test.cjs`, `npx tsc --noEmit`, and `npm run build`. Live account creation still requires verification after deployment.
+
+## Customer role compatibility
+
+This project uses the existing `public.user_role` value `customer` for member accounts. Owner/admin permissions are unchanged. For an existing database, run `supabase/002_customer_role.sql` in the Supabase SQL Editor; it replaces only the member role check in the existing booking function, preserving its other logic, settings, and grants. It does not change existing profiles, enum values, slots, or bookings. New installations should use the updated `001_bookings.sql`. The member endpoint reports success only after Supabase returns the matching saved customer profile.
+
+For the disposable PostgreSQL booking regression test, install `@electric-sql/pglite` outside the project and run:
+
+```sh
+npm install --prefix /tmp/basement-sql-test --no-save @electric-sql/pglite
+BASEMENT_PGLITE_MODULE=/tmp/basement-sql-test/node_modules/@electric-sql/pglite node --test tests/bookings-role.test.cjs
+```
+
+This test recreates the unsupported enum error first, applies the migration twice, then checks customer/owner/admin reservations, capacity, cancellation, and denied roles. It never connects to the live Supabase database.
