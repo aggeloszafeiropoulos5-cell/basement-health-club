@@ -1,0 +1,10 @@
+{
+  "name":"Basement Health Club",
+  "short_name":"Basement",
+  "description":"Κρατήσεις και διαχείριση Basement Health Club",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#080a0e",
+  "theme_color":"#8038df",
+  "icons":[{"src":"/basement-logo.jpeg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"}]
+}
