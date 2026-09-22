@@ -1,5 +1,5 @@
 "use client";
-import {useCallback,useEffect,useMemo,useState} from "react";
+import {useCallback,useEffect,useMemo,useState,type CSSProperties} from "react";
 import {api} from "../../lib/supabase-rest";
 
 type Slot={id:number;service:string;starts_at:string;ends_at:string;capacity:number;enabled:boolean;reserved:number};
@@ -42,7 +42,14 @@ export default function BookingsCalendar({userId,owner,members}:{userId:string;o
   const days=useMemo(()=>[...new Set(slots.map(s=>dayKey(s.starts_at)))], [slots]);
   const activeDay=selectedDay&&days.includes(selectedDay)?selectedDay:days[0];
   const shown=slots.filter(s=>dayKey(s.starts_at)===activeDay&&(service==="Όλες"||s.service===service));
+  const visibleServices=services.slice(1).filter(name=>service==="Όλες"||name===service);
+  const rowTimes=useMemo(()=>[...new Set(shown.map(s=>s.starts_at))].sort((a,b)=>new Date(a).getTime()-new Date(b).getTime()),[shown]);
+  const activeDayIndex=days.indexOf(activeDay);
   const myBookings=bookings.filter(b=>b.member_id===userId);
+
+  function changeDay(step:number){
+    const next=days[activeDayIndex+step];if(next)setSelectedDay(next);
+  }
 
   async function action(slotId:number,bookingId?:number){
     setError("");setPending(slotId);
@@ -66,32 +73,21 @@ export default function BookingsCalendar({userId,owner,members}:{userId:string;o
     finally{setPending(null)}
   }
 
-  return <div className="booking-panel">
-    <h2>Ημερολόγιο κρατήσεων</h2>
-    <p>Πρόγραμμα επόμενων 14 ημερών · Ώρα Ελλάδας. Το κλείσιμο ώρας εμποδίζει νέες κρατήσεις, χωρίς να ακυρώνει τις υπάρχουσες.</p>
-    <button onClick={()=>void refresh()} disabled={pending!==null}>Ανανέωση θέσεων</button>
+  return <div className="calendar-page">
+    <div className="calendar-toolbar">
+      <div className="day-nav"><button aria-label="Προηγούμενη ημέρα" disabled={activeDayIndex<=0} onClick={()=>changeDay(-1)}>‹</button><label><span>Ημερομηνία</span><select value={activeDay||""} onChange={e=>setSelectedDay(e.target.value)}>{days.map(d=><option value={d} key={d}>{greekDate.format(new Date(`${d}T12:00:00+03:00`))}</option>)}</select></label><button aria-label="Επόμενη ημέρα" disabled={activeDayIndex<0||activeDayIndex>=days.length-1} onClick={()=>changeDay(1)}>›</button></div>
+      <label className="calendar-filter"><span>Φίλτρα</span><select value={service} onChange={e=>setService(e.target.value)}>{services.map(s=><option key={s}>{s}</option>)}</select></label>
+      <button className="new-booking" onClick={()=>document.getElementById("calendar-member")?.focus()}>＋ {owner?"Νέο ραντεβού":"Νέα κράτηση"}</button>
+      <button className="refresh-calendar" onClick={()=>void refresh()} disabled={pending!==null}>↻</button>
+    </div>
     {!ready&&<p>Φόρτωση προγράμματος…</p>}
     {error&&<p className="booking-error" role="alert">{error}</p>}
     {ready&&<>
-      <div className="booking-controls">
-        <label>Ημέρα<select value={activeDay||""} onChange={e=>setSelectedDay(e.target.value)}>{days.map(d=><option value={d} key={d}>{greekDate.format(new Date(`${d}T12:00:00+03:00`))}</option>)}</select></label>
-        <label>Υπηρεσία<select value={service} onChange={e=>setService(e.target.value)}>{services.map(s=><option key={s}>{s}</option>)}</select></label>
-        {owner&&<label>Κράτηση για μέλος<select value={memberId} onChange={e=>setMemberId(e.target.value)}><option value="">Επίλεξε μέλος</option>{members.map(m=><option value={m.id} key={m.id}>{m.full_name||m.id}</option>)}</select></label>}
-      </div>
-      {shown.length?<div className="booking-list">{shown.map(slot=>{
-        const reserved=bookings.filter(b=>b.slot_id===slot.id),free=slot.capacity-Number(slot.reserved);
-        const target=owner?memberId:userId;
-        const existing=reserved.find(b=>b.member_id===target);
-        return <article key={slot.id}>
-          <div><strong>{greekTime.format(new Date(slot.starts_at))}–{greekTime.format(new Date(slot.ends_at))}</strong><span>{slot.service}</span></div>
-          <div className="booking-meta">{slot.enabled?`${Math.max(0,free)} από ${slot.capacity} διαθέσιμες`:"Μη διαθέσιμη"}
-            {owner&&reserved.length>0&&<small>{reserved.map(b=>members.find(m=>m.id===b.member_id)?.full_name||"Μέλος").join(", ")}</small>}
-          </div>
-          {existing?<button className="cancel-booking" disabled={pending!==null} onClick={()=>void action(slot.id,existing.id)}>Ακύρωση</button>:
-            <button disabled={!slot.enabled||free<=0||pending!==null||(owner&&!memberId)} onClick={()=>void action(slot.id)}>{pending===slot.id?"Παρακαλώ περίμενε…":"Κράτηση"}</button>}
-          {owner&&<button className="slot-toggle" disabled={pending!==null} onClick={()=>void toggle(slot)}>{slot.enabled?"Κλείσιμο ώρας":"Άνοιγμα ώρας"}</button>}
-        </article>
-      })}</div>:<p>Δεν υπάρχουν ώρες για την επιλεγμένη ημέρα και υπηρεσία.</p>}
+      {owner&&<div className="calendar-member-picker"><label htmlFor="calendar-member">Κράτηση για μέλος</label><select id="calendar-member" value={memberId} onChange={e=>setMemberId(e.target.value)}><option value="">Επίλεξε μέλος</option>{members.map(m=><option value={m.id} key={m.id}>{m.full_name||m.id}</option>)}</select></div>}
+      {shown.length?<div className="calendar-scroll"><div className="calendar-board" style={{"--service-count":visibleServices.length} as CSSProperties}>
+        <div className="calendar-head time-head">Ώρα</div>{visibleServices.map(name=>{const serviceSlots=shown.filter(s=>s.service===name),reserved=serviceSlots.reduce((sum,s)=>sum+Number(s.reserved),0),capacity=serviceSlots.reduce((sum,s)=>sum+s.capacity,0);return <div className="calendar-head" key={name}><strong>{name}</strong><small>{reserved}/{capacity}</small></div>})}
+        {rowTimes.flatMap(time=>{const start=greekTime.format(new Date(time));return [<div className="calendar-time" key={`time-${time}`}>{start}</div>,...visibleServices.map(name=>{const slot=shown.find(s=>s.starts_at===time&&s.service===name);if(!slot)return <div className="calendar-empty" key={`${time}-${name}`}/>;const reserved=bookings.filter(b=>b.slot_id===slot.id),free=slot.capacity-Number(slot.reserved),target=owner?memberId:userId,existing=reserved.find(b=>b.member_id===target);const state=!slot.enabled?"closed":free<=0?"full":free<=Math.max(1,Math.floor(slot.capacity/3))?"limited":"available";return <article className={`calendar-slot ${state}`} key={slot.id}><header><strong>{slot.service}</strong><span>♟ {slot.reserved}/{slot.capacity}</span></header>{owner&&<ol>{reserved.map(b=><li key={b.id}>{members.find(m=>m.id===b.member_id)?.full_name||"Μέλος"}</li>)}</ol>}<div className="slot-status">{!slot.enabled?"Κλειστή ώρα":free>0?`+${free} ${free===1?"θέση":"θέσεις"} διαθέσιμες`:"Πλήρες"}</div><div className="slot-actions">{existing?<button className="cancel-booking" disabled={pending!==null} onClick={()=>void action(slot.id,existing.id)}>Ακύρωση</button>:<button disabled={!slot.enabled||free<=0||pending!==null||(owner&&!memberId)} onClick={()=>void action(slot.id)}>{pending===slot.id?"…":"Κράτηση"}</button>}{owner&&<button className="slot-toggle" disabled={pending!==null} onClick={()=>void toggle(slot)}>{slot.enabled?"Κλείσιμο":"Άνοιγμα"}</button>}</div></article>})]})}
+      </div></div>:<p>Δεν υπάρχουν ώρες για την επιλεγμένη ημέρα και υπηρεσία.</p>}
       {!owner&&myBookings.length>0&&<p className="booking-footnote">Έχεις {myBookings.length} ενεργές κρατήσεις. Μπορείς να τις ακυρώσεις από την αντίστοιχη ημέρα.</p>}
     </>}
   </div>;
