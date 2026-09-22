@@ -41,10 +41,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Συμπλήρωσε όνομα, email και κωδικό." }, { status: 400 });
     }
     const fullName = body.full_name.trim();
+    const phone = typeof body.phone === "string" && body.phone.trim() ? body.phone.trim() : null;
     const serverHeaders = { apikey: secret, Authorization: `Bearer ${secret}`, "Content-Type": "application/json" };
     const create = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
       method: "POST", headers: serverHeaders,
-      body: JSON.stringify({ email: body.email.trim().toLowerCase(), password: body.password, email_confirm: true, user_metadata: { full_name: fullName, phone: body.phone || null } }),
+      body: JSON.stringify({ email: body.email.trim().toLowerCase(), password: body.password, email_confirm: true, user_metadata: { full_name: fullName, phone } }),
     });
     const created = await create.json();
     if ([401, 403].includes(create.status)) return NextResponse.json({ error: "Το Supabase δεν αποδέχεται το κλειδί διαχείρισης. Έλεγξε το SUPABASE_SECRET_KEY του ίδιου project.", code: "SERVER_KEY_REJECTED" }, { status: 502 });
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(created.id)}&select=id,full_name,role`, {
       method: "PATCH", cache: "no-store",
       headers: { ...serverHeaders, Prefer: "return=representation" },
-      body: JSON.stringify({ full_name: fullName, role: "customer" }),
+      body: JSON.stringify({ full_name: fullName, phone, role: "customer", active: true }),
     });
     const profiles = await profileRes.json().catch(() => null);
     const profile = Array.isArray(profiles) && profiles.length === 1 ? profiles[0] : null;
