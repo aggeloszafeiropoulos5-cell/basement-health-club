@@ -15,12 +15,14 @@ values ('control_center_settings', jsonb_build_object(
 create or replace function public.basement_availability()
 returns table(id bigint,service text,starts_at timestamptz,ends_at timestamptz,capacity integer,enabled boolean,reserved bigint)
 language sql security definer set search_path to 'public','pg_temp' as $$
-  with cfg as (select coalesce((value->>'bookingMaxDays')::integer,14) days from public.app_settings where key='control_center_settings')
+  with cfg as (select coalesce((value->>'bookingMaxDays')::integer,14) days,nullif(value->>'maxAvailableDate','')::date max_date,coalesce(nullif(value->>'openingTime','')::time,'00:00') opening_time,coalesce(nullif(value->>'closingTime','')::time,'23:59') closing_time from public.app_settings where key='control_center_settings')
   select s.id,s.service,s.starts_at,s.ends_at,s.capacity,s.enabled,
     (select count(*) from public.basement_bookings b where b.slot_id=s.id and b.status='booked')
   from public.basement_slots s
   where auth.uid() is not null and s.starts_at>now()
-    and s.starts_at<now()+make_interval(days=>coalesce((select days from cfg),14))
+    and s.starts_at<case when (select max_date from cfg) is not null then ((select max_date from cfg)+1)::timestamp at time zone 'Europe/Athens' else now()+make_interval(days=>coalesce((select days from cfg),14)) end
+    and (s.starts_at at time zone 'Europe/Athens')::time>=(select opening_time from cfg)
+    and (s.starts_at at time zone 'Europe/Athens')::time<=(select closing_time from cfg)
   order by s.starts_at,s.service;
 $$;
 
