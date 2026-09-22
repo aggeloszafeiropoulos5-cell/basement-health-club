@@ -1,4 +1,6 @@
-# Basement Health Club Control Center
+# Basement Health Club Control Center V13
+
+Η V13 προσθέτει πλήρη επεξεργάσιμη καρτέλα μέλους, οφειλή και ημερομηνία γέννησης, εξαγωγή CSV, ασφαλή χειροκίνητη διόρθωση συνεδριών, ολοκλήρωση/no-show/αναίρεση ραντεβού, audit log και αυτόματη προώθηση λίστας αναμονής.
 
 Independent public website, Member Portal and Owner Dashboard for the Basement Health Club.
 
