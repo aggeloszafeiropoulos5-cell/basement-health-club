@@ -11,7 +11,7 @@ import OperationsPanel from "./operations-panel";
 import MemberProfilePanel from "./member-profile-panel";
 import MemberRecordsPanel from "./member-records-panel";
 
-type Profile={id:string;full_name:string|null;role:string};
+type Profile={id:string;full_name:string|null;role:string;phone?:string|null;email?:string|null;active?:boolean};
 const roleLabels:Record<string,string>={owner:"Ιδιοκτήτης",admin:"Διαχειριστής",reception:"Υποδοχή",trainer:"Γυμναστής",customer:"Μέλος"};
 
 export default function DashboardClient(){
@@ -32,9 +32,10 @@ export default function DashboardClient(){
     if(!me){logout();return}
     setProfile(me);
     if(["owner","admin"].includes(me.role)){
-      const m=await api("/rest/v1/profiles?role=eq.customer&select=id,full_name,role&order=full_name",token());
+      const m=await api("/rest/v1/members?select=auth_user_id,full_name,email,phone,active&auth_user_id=not.is.null&order=full_name",token());
       if(!m.ok)throw new Error("Δεν ήταν δυνατή η φόρτωση των μελών.");
-      setMembers(await m.json());
+      const memberRows=await m.json();
+      setMembers(memberRows.map((member:{auth_user_id:string;full_name:string|null;email?:string|null;phone?:string|null;active?:boolean})=>({id:member.auth_user_id,full_name:member.full_name,email:member.email,phone:member.phone,active:member.active,role:"customer"})));
     }
     const count=async(path:string)=>{const response=await api(path,token(),{method:"HEAD",headers:{Prefer:"count=exact"}});return response.ok?(response.headers.get("content-range")?.split("/")[1]||"0"):"—"};
     const [memberCount,bookingCount,packageCount,serviceCount]=await Promise.all([
@@ -62,7 +63,7 @@ export default function DashboardClient(){
   {tab==="overview"&&<><div className="dash-grid"><article><small>Ενεργά μέλη</small><strong>{owner?stats.members:"—"}</strong></article><article><small>Κρατήσεις</small><strong>{stats.bookings}</strong></article><article><small>Ενεργά πακέτα</small><strong>{stats.packages}</strong></article><article><small>Υπηρεσίες</small><strong>{stats.services}</strong></article></div><div className="overview-panels"><article><span className="status-dot">● Η ΣΥΝΔΕΣΗ ΛΕΙΤΟΥΡΓΕΙ</span><h2>Basement Control Center</h2><p>Ο λογαριασμός είναι συνδεδεμένος με τη βάση του Basement. Οι κρατήσεις, τα μέλη και τα πακέτα ενημερώνονται σε πραγματικό χρόνο.</p><button onClick={()=>setTab("calendar")}>Άνοιξε το ημερολόγιο →</button></article><article><span className="kicker">ΓΡΗΓΟΡΕΣ ΕΝΕΡΓΕΙΕΣ</span><h2>{owner?"Διαχείριση επιχείρησης":"Η συνδρομή σου"}</h2><div className="quick-links"><button onClick={()=>setTab("calendar")}>Ημερολόγιο</button>{owner&&<button onClick={()=>setTab("members")}>Νέο μέλος</button>}<button onClick={()=>setTab("packages")}>Πακέτα</button></div></article></div></>}
   {tab==="calendar"&&<BookingsCalendar userId={profile.id} owner={owner} members={members}/>}
   {tab==="members"&&owner&&<><div className="panel-title"><div><h2>Μέλη</h2><p>Πλήρης καρτέλα, συνεδρίες, τηλέφωνο, κρατήσεις και ιστορικό.</p></div></div><details className="new-member-drawer"><summary>＋ Δημιουργία νέου μέλους</summary><form className="admin-form" onSubmit={createMember}><label>Ονοματεπώνυμο<input name="full_name" required/></label><label>Email<input name="email" type="email" required/></label><label>Προσωρινός κωδικός<input name="password" type="password" minLength={8} required/></label><label>Τηλέφωνο<input name="phone" inputMode="tel"/></label><button disabled={busy}>{busy?"Δημιουργία…":"Δημιουργία μέλους"}</button>{notice&&<p className="notice" role="status">{notice}</p>}</form></details><MemberRecordsPanel/></>}
-  {tab==="packages"&&<PackagesPanel owner={owner} userId={profile.id}/>} 
+  {tab==="packages"&&<PackagesPanel owner={owner} userId={profile.id}/>}
   {tab==="operations"&&owner&&<OperationsPanel/>}
   {tab==="profile"&&<MemberProfilePanel userId={profile.id}/>}
   {tab==="settings"&&<SettingsPanel owner={owner} profile={{full_name:profile.full_name,role:roleLabels[profile.role]||profile.role}}/>}
