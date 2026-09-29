@@ -216,3 +216,36 @@
   .calendar-view-context { order: 3; flex-basis: 100%; font-size: 14px; }
   .calendar-view-bar button { flex: 1; }
 }
+
+/* V29: use the full app viewport, with service headings touching its top edge. */
+.calendar-page.calendar-focus {
+  position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column;
+  width: 100%; height: 100vh; height: 100dvh; min-height: 0; margin: 0; padding: 0;
+  overflow: hidden; background: #0b0d12;
+}
+.control:has(.calendar-focus) > header,
+.control-body:has(.calendar-focus) > aside,
+.control-body > section:has(.calendar-focus) > .dashboard-title { display: none; }
+.calendar-focus > .calendar-view-bar { display: none; }
+.calendar-page.calendar-focus .calendar-scroll {
+  flex: 1 1 0; min-height: 0; max-height: none; width: 100%;
+  border: 0; border-radius: 0; scroll-padding-bottom: 68px;
+}
+.calendar-focus .calendar-board { padding-bottom: 68px; }
+.calendar-focus > .booking-error, .calendar-focus > .booking-success { flex-shrink: 0; margin: 0; }
+.calendar-focus-actions {
+  position: fixed; z-index: 110; right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom)); display: flex; align-items: center;
+  gap: 6px; max-width: calc(100% - 16px); padding: 5px; border: 1px solid #806099;
+  border-radius: 10px; background: #171b28f5; box-shadow: 0 3px 12px #0008;
+}
+.calendar-focus-actions > span { min-width: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; color: #fff; font-size: 14px; font-weight: 800; }
+.calendar-focus-actions button { min-height: 44px; padding: 8px 10px; border: 1px solid #8863ae; border-radius: 7px; background: #342044; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
+.calendar-page.calendar-focus.calendar-focus-tools { display: block; overflow-y: auto; padding-bottom: 70px; }
+.calendar-focus.calendar-focus-tools > .calendar-view-bar { display: flex; position: static; margin: 0; border-radius: 0; flex-wrap: wrap; }
+.calendar-focus.calendar-focus-tools > .calendar-size-controls { margin: 0; border-radius: 0; }
+.calendar-page.calendar-focus.calendar-focus-tools .calendar-scroll { height: 65vh; height: 65dvh; min-height: 240px; }
+@media (max-width: 600px) {
+  .calendar-focus-actions > span { max-width: 105px; font-size: 12px; }
+  .calendar-focus-actions button { padding: 7px; font-size: 13px; }
+}
