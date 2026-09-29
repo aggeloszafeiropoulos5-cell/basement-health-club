@@ -217,6 +217,22 @@
   .calendar-view-bar button { flex: 1; }
 }
 
+/* V30: direct member booking and compact full-view day navigation. */
+.quick-booking-dialog { width: min(560px, calc(100% - 24px)); max-height: 85dvh; margin: auto; padding: 20px; border: 1px solid #9366c4; border-radius: 16px; background: #171923; color: #fff; overflow-y: auto; }
+.quick-booking-dialog::backdrop { background: #000a; }
+.quick-booking-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.quick-booking-dialog h2 { margin: 0; font-size: 24px; }
+.quick-booking-dialog p { margin: 12px 0; }
+.quick-booking-dialog label { display: block; font-weight: 700; margin-bottom: 8px; }
+.quick-booking-dialog input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px; font-size: 18px; border: 1px solid #9366c4; border-radius: 8px; background: #090b12; color: #fff; }
+.quick-booking-dialog button { min-height: 44px; padding: 10px; color: #fff; border: 1px solid #806099; border-radius: 8px; background: #30233f; cursor: pointer; }
+.quick-booking-results { display: grid; gap: 8px; }
+.quick-booking-results button { text-align: left; display: grid; gap: 5px; overflow-wrap: anywhere; }
+.quick-booking-results strong { font-size: 19px; }
+.quick-booking-results span { font-size: 15px; }
+.quick-booking-dialog button:disabled { opacity: .5; cursor: default; }
+.quick-booking-dialog :focus-visible { outline: 3px solid #d6b4ff; outline-offset: 2px; }
+
 /* V29: use the full app viewport, with service headings touching its top edge. */
 .calendar-page.calendar-focus {
   position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column;
@@ -239,13 +255,19 @@
   gap: 6px; max-width: calc(100% - 16px); padding: 5px; border: 1px solid #806099;
   border-radius: 10px; background: #171b28f5; box-shadow: 0 3px 12px #0008;
 }
-.calendar-focus-actions > span { min-width: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; color: #fff; font-size: 14px; font-weight: 800; }
+.focus-day-navigation { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.focus-day-navigation select { width: 230px; min-width: 0; min-height: 44px; padding: 6px; border: 1px solid #8863ae; border-radius: 7px; background: #171b28; color: #fff; font-size: 14px; font-weight: 800; }
+.calendar-focus-actions button:disabled { opacity: .4; cursor: default; }
 .calendar-focus-actions button { min-height: 44px; padding: 8px 10px; border: 1px solid #8863ae; border-radius: 7px; background: #342044; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
 .calendar-page.calendar-focus.calendar-focus-tools { display: block; overflow-y: auto; padding-bottom: 70px; }
 .calendar-focus.calendar-focus-tools > .calendar-view-bar { display: flex; position: static; margin: 0; border-radius: 0; flex-wrap: wrap; }
 .calendar-focus.calendar-focus-tools > .calendar-size-controls { margin: 0; border-radius: 0; }
 .calendar-page.calendar-focus.calendar-focus-tools .calendar-scroll { height: 65vh; height: 65dvh; min-height: 240px; }
 @media (max-width: 600px) {
-  .calendar-focus-actions > span { max-width: 105px; font-size: 12px; }
+  .calendar-focus-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .focus-day-navigation { flex: 1 1 100%; }
+  .focus-day-navigation select { flex: 1; width: 0; }
+  .calendar-focus .calendar-board { padding-bottom: 120px; }
+  .calendar-page.calendar-focus .calendar-scroll { scroll-padding-bottom: 120px; }
   .calendar-focus-actions button { padding: 7px; font-size: 13px; }
 }
