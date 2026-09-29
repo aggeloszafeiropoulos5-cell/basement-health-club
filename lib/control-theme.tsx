@@ -2,7 +2,7 @@
 import {createContext,useContext,useEffect,useState,type CSSProperties,type ReactNode} from "react";
 import {api} from "./supabase-rest";
 
-export const referenceColors={primary:"#7138dc",header:"#202c43",background:"#f5f6fa",green:"#07864d",orange:"#c35a06",red:"#ce2949",blue:"#0774d1"};
+export const referenceColors={primary:"#8a43ef",header:"#0f1117",background:"#080a0e",green:"#07864d",orange:"#c35a06",red:"#ce2949",blue:"#0774d1"};
 export type ControlConfig={name:string;subtitle:string;colors:typeof referenceColors;step:number;defaultView:string;lowSessions:number;expiryDays:number;inactiveDays:number;calendarColorMode:string};
 export const referenceConfig:ControlConfig={name:"BASEMENT",subtitle:"HEALTH CLUB",colors:referenceColors,step:60,defaultView:"day",lowSessions:1,expiryDays:7,inactiveDays:30,calendarColorMode:"status"};
 export function cleanConfig(value:Partial<ControlConfig>|null):ControlConfig{
