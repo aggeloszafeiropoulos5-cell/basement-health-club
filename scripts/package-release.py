@@ -4,7 +4,7 @@ import json
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-output = root / "Basement-Control-Center-V33-NOW-LINE.zip"
+output = root / "Basement-Control-Center-V35-CONTROL-CENTER.zip"
 directories = ["app", "lib", "public", "supabase", "tests", "scripts"]
 files = []
 for name in directories:
@@ -24,5 +24,8 @@ with zipfile.ZipFile(output) as archive:
     names = archive.namelist()
     assert not any(".github" in name or ".env" in name or name.endswith(".zip") for name in names)
     assert "public/sw.js" in names and "app/dashboard/notifications-panel.tsx" in names
+    assert "app/dashboard/reference-settings.tsx" in names and "app/dashboard/reference-sessions.tsx" in names
+    assert "supabase/migrations/20260929213000_reference_control_center.sql" in names
+    assert "app/dashboard/member-portal.tsx" in names and "lib/control-theme.tsx" in names
     json.loads(archive.read("public/manifest.webmanifest"))
 print(f"{output.name}: {len(files)} files, {output.stat().st_size} bytes, ZIP verified")

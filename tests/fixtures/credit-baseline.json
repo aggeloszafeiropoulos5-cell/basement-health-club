@@ -1,0 +1,1285 @@
+{
+  "enums": [
+    {
+      "labels": [
+        "confirmed",
+        "checked_in",
+        "cancelled",
+        "late_cancel",
+        "no_show",
+        "moved"
+      ],
+      "typname": "booking_status"
+    },
+    {
+      "labels": [
+        "scheduled",
+        "active",
+        "completed",
+        "expired",
+        "cancelled"
+      ],
+      "typname": "package_status"
+    },
+    {
+      "labels": [
+        "owner",
+        "admin",
+        "reception",
+        "trainer",
+        "customer"
+      ],
+      "typname": "user_role"
+    }
+  ],
+  "columns": [
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "app_settings",
+      "column_name": "key",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "jsonb",
+      "data_type": "jsonb",
+      "table_name": "app_settings",
+      "column_name": "value",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "app_settings",
+      "column_name": "updated_by",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "app_settings",
+      "column_name": "updated_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "audit_log",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "audit_log",
+      "column_name": "actor_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "audit_log",
+      "column_name": "action",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "audit_log",
+      "column_name": "table_name",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "audit_log",
+      "column_name": "record_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "jsonb",
+      "data_type": "jsonb",
+      "table_name": "audit_log",
+      "column_name": "old_value",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "jsonb",
+      "data_type": "jsonb",
+      "table_name": "audit_log",
+      "column_name": "new_value",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "audit_log",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_bookings",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_bookings",
+      "column_name": "slot_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "basement_bookings",
+      "column_name": "member_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "basement_bookings",
+      "column_name": "status",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'booked'::text"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_bookings",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_bookings",
+      "column_name": "cancelled_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_bookings",
+      "column_name": "checked_in_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_bookings",
+      "column_name": "completed_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "basement_bookings",
+      "column_name": "notes",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "basement_bookings",
+      "column_name": "payment_status",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'unpaid'::text"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_bookings",
+      "column_name": "moved_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_bookings",
+      "column_name": "moved_from_slot_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_bookings",
+      "column_name": "paid_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_session_usage",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_session_usage",
+      "column_name": "booking_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "basement_session_usage",
+      "column_name": "member_package_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "basement_session_usage",
+      "column_name": "change",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'-1'::integer"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_session_usage",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_slots",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "basement_slots",
+      "column_name": "service",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_slots",
+      "column_name": "starts_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_slots",
+      "column_name": "ends_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "basement_slots",
+      "column_name": "capacity",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "basement_slots",
+      "column_name": "enabled",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_waiting_list",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "basement_waiting_list",
+      "column_name": "slot_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "basement_waiting_list",
+      "column_name": "member_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "basement_waiting_list",
+      "column_name": "status",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'waiting'::text"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "basement_waiting_list",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "closures",
+      "column_name": "id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "closures",
+      "column_name": "location_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "date",
+      "data_type": "date",
+      "table_name": "closures",
+      "column_name": "closure_date",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "closures",
+      "column_name": "closure_type",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "closures",
+      "column_name": "reason",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "closures",
+      "column_name": "service_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "time",
+      "data_type": "time without time zone",
+      "table_name": "closures",
+      "column_name": "starts_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "time",
+      "data_type": "time without time zone",
+      "table_name": "closures",
+      "column_name": "ends_at",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "financial_entries",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "financial_entries",
+      "column_name": "member_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "financial_entries",
+      "column_name": "kind",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "financial_entries",
+      "column_name": "category",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "numeric",
+      "data_type": "numeric",
+      "table_name": "financial_entries",
+      "column_name": "amount",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "date",
+      "data_type": "date",
+      "table_name": "financial_entries",
+      "column_name": "occurred_on",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "CURRENT_DATE"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "financial_entries",
+      "column_name": "notes",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "financial_entries",
+      "column_name": "created_by",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "financial_entries",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "gym_checkins",
+      "column_name": "id",
+      "is_identity": "YES",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "gym_checkins",
+      "column_name": "member_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "gym_checkins",
+      "column_name": "checked_in_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "gym_checkins",
+      "column_name": "method",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'manual'::text"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "gym_checkins",
+      "column_name": "notes",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "gym_checkins",
+      "column_name": "created_by",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int8",
+      "data_type": "bigint",
+      "table_name": "gym_checkins",
+      "column_name": "booking_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "member_packages",
+      "column_name": "id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "member_packages",
+      "column_name": "member_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "member_packages",
+      "column_name": "package_template_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "date",
+      "data_type": "date",
+      "table_name": "member_packages",
+      "column_name": "starts_on",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "date",
+      "data_type": "date",
+      "table_name": "member_packages",
+      "column_name": "expires_on",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "member_packages",
+      "column_name": "sessions_total",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "member_packages",
+      "column_name": "sessions_remaining",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "package_status",
+      "data_type": "USER-DEFINED",
+      "table_name": "member_packages",
+      "column_name": "status",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'active'::package_status"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "member_packages",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "date",
+      "data_type": "date",
+      "table_name": "member_packages",
+      "column_name": "frozen_until",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "members",
+      "column_name": "id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "members",
+      "column_name": "auth_user_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "members",
+      "column_name": "home_location_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "members",
+      "column_name": "full_name",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "members",
+      "column_name": "email",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "members",
+      "column_name": "phone",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "members",
+      "column_name": "qr_token",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "members",
+      "column_name": "notes",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "members",
+      "column_name": "active",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "members",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "date",
+      "data_type": "date",
+      "table_name": "members",
+      "column_name": "date_of_birth",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "numeric",
+      "data_type": "numeric",
+      "table_name": "members",
+      "column_name": "debt",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "package_template_services",
+      "column_name": "package_template_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "package_template_services",
+      "column_name": "service_id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "package_templates",
+      "column_name": "id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "package_templates",
+      "column_name": "name",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "package_templates",
+      "column_name": "sessions_total",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "package_templates",
+      "column_name": "validity_days",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "numeric",
+      "data_type": "numeric",
+      "table_name": "package_templates",
+      "column_name": "price",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "package_templates",
+      "column_name": "max_bookings_day",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "package_templates",
+      "column_name": "max_bookings_week",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "package_templates",
+      "column_name": "online_booking_enabled",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "package_templates",
+      "column_name": "waiting_list_enabled",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "package_templates",
+      "column_name": "cancellation_hours",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "6"
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "package_templates",
+      "column_name": "active",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "package_templates",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "profiles",
+      "column_name": "id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "profiles",
+      "column_name": "full_name",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "profiles",
+      "column_name": "phone",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "user_role",
+      "data_type": "USER-DEFINED",
+      "table_name": "profiles",
+      "column_name": "role",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'customer'::user_role"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "profiles",
+      "column_name": "location_id",
+      "is_identity": "NO",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "profiles",
+      "column_name": "active",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "profiles",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "udt_name": "uuid",
+      "data_type": "uuid",
+      "table_name": "services",
+      "column_name": "id",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "services",
+      "column_name": "code",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "services",
+      "column_name": "name",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "services",
+      "column_name": "duration_minutes",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "udt_name": "int4",
+      "data_type": "integer",
+      "table_name": "services",
+      "column_name": "default_capacity",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "1"
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "services",
+      "column_name": "waiting_list_enabled",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "services",
+      "column_name": "online_booking_enabled",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "services",
+      "column_name": "overbooking_enabled",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "text",
+      "data_type": "text",
+      "table_name": "services",
+      "column_name": "color",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "'#7c3aed'::text"
+    },
+    {
+      "udt_name": "bool",
+      "data_type": "boolean",
+      "table_name": "services",
+      "column_name": "active",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "udt_name": "timestamptz",
+      "data_type": "timestamp with time zone",
+      "table_name": "services",
+      "column_name": "created_at",
+      "is_identity": "NO",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "member_packages_check",
+      "tablename": "member_packages",
+      "definition": "CHECK ((expires_on >= starts_on))"
+    },
+    {
+      "conname": "member_packages_member_id_fkey",
+      "tablename": "member_packages",
+      "definition": "FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "member_packages_package_template_id_fkey",
+      "tablename": "member_packages",
+      "definition": "FOREIGN KEY (package_template_id) REFERENCES package_templates(id)"
+    },
+    {
+      "conname": "member_packages_pkey",
+      "tablename": "member_packages",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "member_packages_sessions_remaining_check",
+      "tablename": "member_packages",
+      "definition": "CHECK (((sessions_remaining IS NULL) OR (sessions_remaining >= 0)))"
+    },
+    {
+      "conname": "basement_bookings_member_id_fkey",
+      "tablename": "basement_bookings",
+      "definition": "FOREIGN KEY (member_id) REFERENCES auth.users(id)"
+    },
+    {
+      "conname": "basement_bookings_moved_from_slot_id_fkey",
+      "tablename": "basement_bookings",
+      "definition": "FOREIGN KEY (moved_from_slot_id) REFERENCES basement_slots(id) ON DELETE SET NULL"
+    },
+    {
+      "conname": "basement_bookings_payment_status_check",
+      "tablename": "basement_bookings",
+      "definition": "CHECK ((payment_status = ANY (ARRAY['unpaid'::text, 'paid'::text])))"
+    },
+    {
+      "conname": "basement_bookings_pkey",
+      "tablename": "basement_bookings",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "basement_bookings_slot_id_fkey",
+      "tablename": "basement_bookings",
+      "definition": "FOREIGN KEY (slot_id) REFERENCES basement_slots(id)"
+    },
+    {
+      "conname": "basement_bookings_status_check",
+      "tablename": "basement_bookings",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'booked'::text, 'cancelled'::text, 'late_cancel'::text, 'completed'::text, 'no_show'::text])))"
+    },
+    {
+      "conname": "gym_checkins_booking_id_fkey",
+      "tablename": "gym_checkins",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES basement_bookings(id) ON DELETE SET NULL"
+    },
+    {
+      "conname": "gym_checkins_created_by_fkey",
+      "tablename": "gym_checkins",
+      "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+    },
+    {
+      "conname": "gym_checkins_member_id_fkey",
+      "tablename": "gym_checkins",
+      "definition": "FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "gym_checkins_method_check",
+      "tablename": "gym_checkins",
+      "definition": "CHECK ((method = ANY (ARRAY['manual'::text, 'qr'::text, 'automatic'::text])))"
+    },
+    {
+      "conname": "gym_checkins_pkey",
+      "tablename": "gym_checkins",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "basement_waiting_list_member_id_fkey",
+      "tablename": "basement_waiting_list",
+      "definition": "FOREIGN KEY (member_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "basement_waiting_list_pkey",
+      "tablename": "basement_waiting_list",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "basement_waiting_list_slot_id_fkey",
+      "tablename": "basement_waiting_list",
+      "definition": "FOREIGN KEY (slot_id) REFERENCES basement_slots(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "basement_waiting_list_slot_id_member_id_status_key",
+      "tablename": "basement_waiting_list",
+      "definition": "UNIQUE (slot_id, member_id, status)"
+    },
+    {
+      "conname": "basement_waiting_list_status_check",
+      "tablename": "basement_waiting_list",
+      "definition": "CHECK ((status = ANY (ARRAY['waiting'::text, 'promoted'::text, 'cancelled'::text])))"
+    },
+    {
+      "conname": "basement_session_usage_booking_id_fkey",
+      "tablename": "basement_session_usage",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES basement_bookings(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "basement_session_usage_booking_id_key",
+      "tablename": "basement_session_usage",
+      "definition": "UNIQUE (booking_id)"
+    },
+    {
+      "conname": "basement_session_usage_member_package_id_fkey",
+      "tablename": "basement_session_usage",
+      "definition": "FOREIGN KEY (member_package_id) REFERENCES member_packages(id) ON DELETE SET NULL"
+    },
+    {
+      "conname": "basement_session_usage_pkey",
+      "tablename": "basement_session_usage",
+      "definition": "PRIMARY KEY (id)"
+    }
+  ],
+  "functions": [
+    {
+      "proname": "basement_adjust_sessions",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_adjust_sessions(p_member_package_id uuid, p_change integer, p_reason text DEFAULT NULL::text)\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_role text; v_remaining integer;\nbegin\n  select role into v_role from public.profiles where id=auth.uid();\n  if coalesce(v_role,'') not in ('owner','admin','reception') then raise exception 'Δεν επιτρέπεται η αλλαγή συνεδριών.'; end if;\n  if p_change=0 then raise exception 'Η μεταβολή πρέπει να είναι διαφορετική από μηδέν.'; end if;\n  update public.member_packages\n     set sessions_remaining=greatest(0,coalesce(sessions_remaining,0)+p_change)\n   where id=p_member_package_id\n   returning sessions_remaining into v_remaining;\n  if not found then raise exception 'Το πακέτο δεν βρέθηκε.'; end if;\n  insert into public.manual_session_adjustments(member_package_id,change,reason,actor_id)\n  values(p_member_package_id,p_change,p_reason,auth.uid());\n  return v_remaining;\nend $function$\n"
+    },
+    {
+      "proname": "basement_book",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_book(p_slot_id bigint, p_member_id uuid DEFAULT NULL::uuid)\n RETURNS bigint\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare\n  v_actor uuid:=auth.uid(); v_role text; v_target uuid; v_slot public.basement_slots%rowtype;\n  v_cfg jsonb:='{}'; v_is_admin boolean; v_member uuid; v_member_active boolean;\n  v_service public.services%rowtype; v_count integer; v_id bigint; v_status text;\n  v_package public.member_packages%rowtype; v_template public.package_templates%rowtype;\n  v_local_start timestamp; v_now_local timestamp:=now() at time zone 'Europe/Athens';\n  v_wait_count integer; v_no_show_count integer; v_limit integer;\nbegin\n  if v_actor is null then raise exception 'Απαιτείται σύνδεση.'; end if;\n  select role::text into v_role from public.profiles where id=v_actor and active;\n  v_is_admin:=coalesce(v_role,'') in ('owner','admin','reception');\n  v_target:=coalesce(p_member_id,v_actor);\n  if v_target<>v_actor and not v_is_admin then raise exception 'Δεν επιτρέπεται κράτηση για άλλο μέλος.'; end if;\n  if not exists(select 1 from public.profiles where id=v_target and role='customer' and active) then raise exception 'Δεν βρέθηκε ενεργό μέλος.'; end if;\n  select coalesce(value,'{}') into v_cfg from public.app_settings where key='control_center_settings';\n  if not v_is_admin and coalesce((v_cfg->>'pauseBookings')::boolean,false) then raise exception 'Οι νέες κρατήσεις είναι προσωρινά κλειστές.'; end if;\n  if not v_is_admin and not coalesce((v_cfg->>'existingCustomerBooking')::boolean,true) then raise exception 'Οι online κρατήσεις μελών είναι απενεργοποιημένες.'; end if;\n\n  select * into v_slot from public.basement_slots where id=p_slot_id for update;\n  if not found or not v_slot.enabled then raise exception 'Η ώρα δεν είναι διαθέσιμη.'; end if;\n  v_local_start:=v_slot.starts_at at time zone 'Europe/Athens';\n  if v_slot.starts_at<=now() then raise exception 'Η ώρα έχει ήδη ξεκινήσει.'; end if;\n  if not v_is_admin and v_slot.starts_at<now()+make_interval(secs=>(coalesce((v_cfg->>'bookingMinHours')::numeric,0)*3600)::integer) then raise exception 'Η κράτηση πρέπει να γίνει νωρίτερα σύμφωνα με την πολιτική κρατήσεων.'; end if;\n  if not v_is_admin and v_slot.starts_at>now()+make_interval(days=>coalesce((v_cfg->>'bookingMaxDays')::integer,14)) then raise exception 'Η ημερομηνία είναι έξω από το επιτρεπόμενο διάστημα κρατήσεων.'; end if;\n  if nullif(v_cfg->>'maxAvailableDate','') is not null and v_local_start::date>(v_cfg->>'maxAvailableDate')::date then raise exception 'Η ημερομηνία δεν είναι διαθέσιμη.'; end if;\n  if not v_is_admin and v_local_start::date=v_now_local::date+1 and v_now_local::time>coalesce(nullif(v_cfg->>'previousDayDeadline','')::time,'23:59') then raise exception 'Έληξε η προθεσμία κράτησης για την επόμενη ημέρα.'; end if;\n  if v_local_start::time<coalesce(nullif(v_cfg->>'openingTime','')::time,'00:00') or v_local_start::time>coalesce(nullif(v_cfg->>'closingTime','')::time,'23:59') then raise exception 'Η ώρα είναι εκτός ωραρίου λειτουργίας.'; end if;\n\n  select * into v_service from public.services where lower(name)=lower(v_slot.service) limit 1;\n  if found and not v_is_admin and (not v_service.active or not v_service.online_booking_enabled) then raise exception 'Η υπηρεσία δεν δέχεται online κρατήσεις.'; end if;\n  if coalesce((v_cfg->>'holidayRestrictions')::boolean,true) and exists(\n    select 1 from public.closures c where c.closure_date=v_local_start::date\n      and (c.service_id is null or c.service_id=v_service.id)\n      and (c.starts_at is null or v_local_start::time>=c.starts_at)\n      and (c.ends_at is null or v_local_start::time<c.ends_at)\n  ) then raise exception 'Η επιλεγμένη ώρα είναι κλειστή λόγω αργίας ή ειδικού ωραρίου.'; end if;\n\n  select id,active into v_member,v_member_active from public.members where auth_user_id=v_target;\n  if v_member is null then raise exception 'Δεν βρέθηκε καρτέλα μέλους.'; end if;\n  if not v_is_admin and coalesce((v_cfg->>'activeCustomersOnly')::boolean,true) and not coalesce(v_member_active,false) then raise exception 'Απαιτείται ενεργό μέλος.'; end if;\n  if exists(select 1 from public.basement_bookings where slot_id=p_slot_id and member_id=v_target and status in('pending','booked')) then raise exception 'Το μέλος έχει ήδη κράτηση σε αυτή την ώρα.'; end if;\n  if not coalesce((v_cfg->>'allowDoubleBooking')::boolean,false) or not coalesce((v_cfg->>'overlapAvailability')::boolean,true) then\n    if exists(select 1 from public.basement_bookings b join public.basement_slots s on s.id=b.slot_id\n      where b.member_id=v_target and b.status in('pending','booked') and s.starts_at<v_slot.ends_at and s.ends_at>v_slot.starts_at) then\n      raise exception 'Υπάρχει ήδη κράτηση που επικαλύπτει αυτή την ώρα.';\n    end if;\n  end if;\n\n  v_limit:=coalesce((v_cfg->>'noShowLimit')::integer,0);\n  if not v_is_admin and v_limit>0 then\n    select count(*) into v_no_show_count from public.basement_bookings where member_id=v_target and status='no_show';\n    if v_no_show_count>=v_limit then raise exception 'Το όριο απουσιών έχει συμπληρωθεί. Επικοινώνησε με το γυμναστήριο.'; end if;\n  end if;\n\n  select mp.* into v_package from public.member_packages mp\n   where mp.member_id=v_member and mp.status='active' and mp.starts_on<=v_local_start::date\n     and (not coalesce((v_cfg->>'blockAfterExpiry')::boolean,true) or mp.expires_on+coalesce((v_cfg->>'maxAutoExtendDays')::integer,0)>=v_local_start::date)\n     and (mp.frozen_until is null or mp.frozen_until<v_local_start::date)\n     and (mp.sessions_remaining is null or mp.sessions_remaining>0)\n   order by mp.expires_on,mp.created_at limit 1;\n  if not v_is_admin and coalesce((v_cfg->>'creditsRequired')::boolean,true) and v_package.id is null then\n    select count(*) into v_count from public.basement_bookings where member_id=v_target and status in('pending','booked') and created_at>=date_trunc('month',now());\n    if v_count>=coalesce((v_cfg->>'bookingsWithoutCredits')::integer,0) then raise exception 'Δεν υπάρχουν διαθέσιμες συνεδρίες ή ενεργό πακέτο.'; end if;\n  end if;\n  if v_package.id is not null then\n    select * into v_template from public.package_templates where id=v_package.package_template_id;\n    if not v_is_admin or not coalesce((v_cfg->>'adminExceedsLimits')::boolean,true) then\n      if coalesce(v_template.max_bookings_day,0)>0 and (select count(*) from public.basement_bookings b join public.basement_slots s on s.id=b.slot_id where b.member_id=v_target and b.status in('pending','booked') and (s.starts_at at time zone 'Europe/Athens')::date=v_local_start::date)>=v_template.max_bookings_day then raise exception 'Συμπληρώθηκε το ημερήσιο όριο κρατήσεων.'; end if;\n      if coalesce(v_template.max_bookings_week,0)>0 and (select count(*) from public.basement_bookings b join public.basement_slots s on s.id=b.slot_id where b.member_id=v_target and b.status in('pending','booked') and date_trunc('week',s.starts_at at time zone 'Europe/Athens')=date_trunc('week',v_local_start))>=v_template.max_bookings_week then raise exception 'Συμπληρώθηκε το εβδομαδιαίο όριο κρατήσεων.'; end if;\n    end if;\n  end if;\n  v_limit:=coalesce((v_cfg->>'maxBookingsPerPeriod')::integer,0);\n  if not v_is_admin and v_limit>0 and (select count(*) from public.basement_bookings b join public.basement_slots s on s.id=b.slot_id where b.member_id=v_target and b.status in('pending','booked') and date_trunc('week',s.starts_at at time zone 'Europe/Athens')=date_trunc('week',v_local_start))>=v_limit then raise exception 'Συμπληρώθηκε το εβδομαδιαίο όριο κρατήσεων.'; end if;\n\n  select count(*) into v_count from public.basement_bookings where slot_id=p_slot_id and status in('pending','booked');\n  if v_count>=v_slot.capacity or (not coalesce((v_cfg->>'autoConfirm')::boolean,true) and coalesce((v_cfg->>'unconfirmedToWaitlist')::boolean,false)) then\n    if not coalesce((v_cfg->>'waitlistEnabled')::boolean,false) or (v_service.id is not null and not v_service.waiting_list_enabled) then raise exception 'Οι θέσεις εξαντλήθηκαν.'; end if;\n    select count(*) into v_wait_count from public.basement_waiting_list where member_id=v_target and status='waiting';\n    if v_wait_count>=coalesce((v_cfg->>'waitlistLimit')::integer,2) then raise exception 'Συμπληρώθηκε το όριο λίστας αναμονής.'; end if;\n    insert into public.basement_waiting_list(slot_id,member_id,status) values(p_slot_id,v_target,'waiting')\n      on conflict(slot_id,member_id,status) do update set created_at=excluded.created_at returning id into v_id;\n    return -v_id;\n  end if;\n  v_status:=case when coalesce((v_cfg->>'autoConfirm')::boolean,true) or (coalesce((v_cfg->>'autoConfirmExisting')::boolean,false) and v_package.id is not null) then 'booked' else 'pending' end;\n  insert into public.basement_bookings(slot_id,member_id,status) values(p_slot_id,v_target,v_status) returning id into v_id;\n  return v_id;\nend $function$\n"
+    },
+    {
+      "proname": "basement_cancel",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_cancel(p_booking_id bigint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_booking public.basement_bookings%rowtype; v_start timestamptz; v_role text; v_cfg jsonb:='{}'; v_is_admin boolean; v_late boolean; v_count integer; v_member uuid; v_package uuid;\nbegin\n  if auth.uid() is null then raise exception 'Απαιτείται σύνδεση.'; end if;\n  select role::text into v_role from public.profiles where id=auth.uid(); v_is_admin:=coalesce(v_role,'') in ('owner','admin','reception');\n  select * into v_booking from public.basement_bookings where id=p_booking_id for update;\n  if not found or v_booking.status not in('pending','booked') then raise exception 'Η κράτηση δεν βρέθηκε.'; end if;\n  if v_booking.member_id<>auth.uid() and not v_is_admin then raise exception 'Δεν επιτρέπεται η ακύρωση.'; end if;\n  select starts_at into v_start from public.basement_slots where id=v_booking.slot_id;\n  if v_start<=now() and not v_is_admin then raise exception 'Η προπόνηση έχει ήδη ξεκινήσει.'; end if;\n  select coalesce(value,'{}') into v_cfg from public.app_settings where key='control_center_settings';\n  v_late:=v_start<now()+make_interval(mins=>coalesce((v_cfg->>'cancelMinMinutes')::integer,0));\n  if v_late and not v_is_admin then\n    select count(*) into v_count from public.basement_bookings where member_id=v_booking.member_id and status='late_cancel' and cancelled_at>=date_trunc('month',now());\n    if coalesce((v_cfg->>'lateCancelAllowedCount')::integer,0)<=v_count then raise exception 'Έληξε η προθεσμία ακύρωσης.'; end if;\n  end if;\n  update public.basement_bookings set status=case when v_late then 'late_cancel' else 'cancelled' end,cancelled_at=now() where id=p_booking_id;\n  if v_late and coalesce((v_cfg->>'lateCancelNoCredit')::boolean,false) then\n    select id into v_member from public.members where auth_user_id=v_booking.member_id;\n    select count(*) into v_count from public.basement_bookings where member_id=v_booking.member_id and status in('late_cancel','no_show');\n    if v_count>coalesce((v_cfg->>'freeAbsences')::integer,0) and not exists(select 1 from public.basement_session_usage where booking_id=p_booking_id) then\n      select id into v_package from public.member_packages where member_id=v_member and status='active' and coalesce(sessions_remaining,0)>0 order by expires_on limit 1 for update;\n      if v_package is not null then update public.member_packages set sessions_remaining=sessions_remaining-1 where id=v_package; insert into public.basement_session_usage(booking_id,member_package_id,change) values(p_booking_id,v_package,-1); end if;\n    end if;\n  end if;\n  perform public.basement_promote_waiting(v_booking.slot_id);\nend $function$\n"
+    },
+    {
+      "proname": "basement_move_booking",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_move_booking(p_booking_id bigint, p_new_slot_id bigint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_booking public.basement_bookings%rowtype; v_old public.basement_slots%rowtype; v_new public.basement_slots%rowtype; v_cfg jsonb:='{}'; v_role text; v_admin boolean; v_count integer; v_new_status text;\nbegin\n  if auth.uid() is null then raise exception 'Απαιτείται σύνδεση.'; end if;\n  select role::text into v_role from public.profiles where id=auth.uid(); v_admin:=coalesce(v_role,'') in('owner','admin','reception');\n  select coalesce(value,'{}') into v_cfg from public.app_settings where key='control_center_settings';\n  if not v_admin and coalesce((v_cfg->>'disableCustomerMove')::boolean,false) then raise exception 'Η μεταφορά από μέλη είναι απενεργοποιημένη.'; end if;\n  select * into v_booking from public.basement_bookings where id=p_booking_id for update;\n  if not found or v_booking.status not in('pending','booked') then raise exception 'Η κράτηση δεν είναι ενεργή.'; end if;\n  if v_booking.member_id<>auth.uid() and not v_admin then raise exception 'Δεν επιτρέπεται η μεταφορά.'; end if;\n  select * into v_old from public.basement_slots where id=v_booking.slot_id;\n  select * into v_new from public.basement_slots where id=p_new_slot_id for update;\n  if not found or not v_new.enabled then raise exception 'Η νέα ώρα δεν είναι διαθέσιμη.'; end if;\n  if v_new.starts_at<=now() and not (v_admin and coalesce((v_cfg->>'moveToPastAdmin')::boolean,false)) then raise exception 'Δεν επιτρέπεται μεταφορά στο παρελθόν.'; end if;\n  if not v_admin and v_old.starts_at<now()+make_interval(secs=>(coalesce((v_cfg->>'moveMinHours')::numeric,0)*3600)::integer) then raise exception 'Έληξε η προθεσμία μεταφοράς.'; end if;\n  if not coalesce((v_cfg->>'changeServiceOnMove')::boolean,false) and v_new.service<>v_old.service then raise exception 'Δεν επιτρέπεται αλλαγή υπηρεσίας στη μεταφορά.'; end if;\n  select count(*) into v_count from public.basement_bookings where slot_id=p_new_slot_id and status in('pending','booked');\n  if v_count>=v_new.capacity then raise exception 'Η νέα ώρα είναι πλήρης.'; end if;\n  if exists(select 1 from public.basement_bookings where slot_id=p_new_slot_id and member_id=v_booking.member_id and status in('pending','booked') and id<>p_booking_id) then raise exception 'Υπάρχει ήδη κράτηση στη νέα ώρα.'; end if;\n  v_new_status:=case when coalesce((v_cfg->>'keepStatusOnMove')::boolean,true) then v_booking.status else 'booked' end;\n  update public.basement_bookings set slot_id=p_new_slot_id,status=v_new_status,moved_at=now(),moved_from_slot_id=v_booking.slot_id where id=p_booking_id;\n  perform public.basement_promote_waiting(v_booking.slot_id);\nend $function$\n"
+    },
+    {
+      "proname": "basement_admin_booking_action",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_admin_booking_action(p_booking_id bigint, p_action text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_role text; v_booking public.basement_bookings%rowtype; v_member uuid; v_package uuid; v_used integer; v_cfg jsonb:='{}'; v_absences integer;\nbegin\n  select role::text into v_role from public.profiles where id=auth.uid();\n  if coalesce(v_role,'') not in('owner','admin','reception') then raise exception 'Δεν επιτρέπεται αυτή η ενέργεια.'; end if;\n  select * into v_booking from public.basement_bookings where id=p_booking_id for update;\n  if not found then raise exception 'Η κράτηση δεν βρέθηκε.'; end if;\n  select coalesce(value,'{}') into v_cfg from public.app_settings where key='control_center_settings';\n  select id into v_member from public.members where auth_user_id=v_booking.member_id;\n  if p_action in('complete','no_show') then\n    update public.basement_bookings set status=case when p_action='complete' then 'completed' else 'no_show' end,\n      completed_at=now(),checked_in_at=case when p_action='complete' then coalesce(checked_in_at,now()) else checked_in_at end where id=p_booking_id;\n    if p_action='complete' and v_member is not null and coalesce((v_cfg->>'checkIn')::boolean,true) then\n      insert into public.gym_checkins(member_id,booking_id,method,notes) values(v_member,p_booking_id,'automatic','Ολοκλήρωση ραντεβού') on conflict do nothing;\n    end if;\n    select count(*) into v_absences from public.basement_bookings where member_id=v_booking.member_id and status='no_show';\n    if v_member is not null and (p_action='complete' or v_absences>coalesce((v_cfg->>'freeAbsences')::integer,0)) and not exists(select 1 from public.basement_session_usage where booking_id=p_booking_id) then\n      select id into v_package from public.member_packages where member_id=v_member and status='active' and starts_on<=current_date and expires_on>=current_date and (frozen_until is null or frozen_until<current_date) and (sessions_remaining is null or sessions_remaining>0) order by expires_on,id limit 1 for update;\n      if v_package is not null then\n        update public.member_packages set sessions_remaining=case when sessions_remaining is null then null else sessions_remaining-1 end where id=v_package;\n        insert into public.basement_session_usage(booking_id,member_package_id,change) values(p_booking_id,v_package,-1);\n      end if;\n    end if;\n  elsif p_action='confirm' then update public.basement_bookings set status='booked' where id=p_booking_id and status='pending';\n  elsif p_action='pending' then update public.basement_bookings set status='pending' where id=p_booking_id and status='booked';\n  elsif p_action='paid' then update public.basement_bookings set payment_status='paid',paid_at=now() where id=p_booking_id;\n  elsif p_action='unpaid' then update public.basement_bookings set payment_status='unpaid',paid_at=null where id=p_booking_id;\n  elsif p_action='undo' then\n    select coalesce(sum(change),0),min(member_package_id) into v_used,v_package from public.basement_session_usage where booking_id=p_booking_id;\n    if v_package is not null and v_used<0 then update public.member_packages set sessions_remaining=case when sessions_remaining is null then null else sessions_remaining-v_used end where id=v_package; end if;\n    delete from public.basement_session_usage where booking_id=p_booking_id;\n    delete from public.gym_checkins where booking_id=p_booking_id;\n    update public.basement_bookings set status='booked',completed_at=null,checked_in_at=null,cancelled_at=null where id=p_booking_id;\n  else raise exception 'Άγνωστη ενέργεια.'; end if;\nend $function$\n"
+    },
+    {
+      "proname": "basement_auto_complete_due",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_auto_complete_due()\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_role text;\nbegin\n  select role::text into v_role from public.profiles where id=auth.uid() and active;\n  if coalesce(v_role,'') not in('owner','admin','reception') then raise exception 'Δεν επιτρέπεται αυτή η ενέργεια.'; end if;\n  return public.basement_finalize_finished_appointments();\nend $function$\n"
+    },
+    {
+      "proname": "basement_admin_waitlist_action",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_admin_waitlist_action(p_waiting_id bigint, p_action text)\n RETURNS bigint\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_role text; v_wait public.basement_waiting_list%rowtype; v_capacity integer; v_count integer; v_booking bigint;\nbegin\n select role::text into v_role from public.profiles where id=auth.uid() and active;\n if coalesce(v_role,'') not in('owner','admin','reception') then raise exception 'Δεν επιτρέπεται αυτή η ενέργεια.'; end if;\n select * into v_wait from public.basement_waiting_list where id=p_waiting_id for update;\n if not found or v_wait.status<>'waiting' then raise exception 'Η θέση αναμονής δεν είναι ενεργή.'; end if;\n if p_action='cancel' then update public.basement_waiting_list set status='cancelled' where id=p_waiting_id; return null;\n elsif p_action<>'promote' then raise exception 'Άγνωστη ενέργεια.'; end if;\n select capacity into v_capacity from public.basement_slots where id=v_wait.slot_id for update;\n select count(*) into v_count from public.basement_bookings where slot_id=v_wait.slot_id and status in('pending','booked');\n if v_count>=coalesce(v_capacity,0) then raise exception 'Η ώρα είναι πλήρης.'; end if;\n insert into public.basement_bookings(slot_id,member_id,status) values(v_wait.slot_id,v_wait.member_id,'booked')\n on conflict do nothing returning id into v_booking;\n if v_booking is null then raise exception 'Υπάρχει ήδη ενεργή κράτηση για το μέλος.'; end if;\n update public.basement_waiting_list set status='promoted' where id=p_waiting_id;\n return v_booking;\nend $function$\n"
+    },
+    {
+      "proname": "basement_promote_waiting",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_promote_waiting(p_slot_id bigint)\n RETURNS bigint\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_wait public.basement_waiting_list%rowtype; v_id bigint; v_capacity integer; v_count integer; v_cfg jsonb:='{}'; v_status text;\nbegin\n  select coalesce(value,'{}') into v_cfg from public.app_settings where key='control_center_settings';\n  if not coalesce((v_cfg->>'waitlistEnabled')::boolean,false) then return null; end if;\n  select capacity into v_capacity from public.basement_slots where id=p_slot_id for update;\n  select count(*) into v_count from public.basement_bookings where slot_id=p_slot_id and status in('pending','booked');\n  if v_count>=coalesce(v_capacity,0) then return null; end if;\n  select * into v_wait from public.basement_waiting_list\n   where slot_id=p_slot_id and status='waiting' order by created_at,id limit 1 for update skip locked;\n  if not found then return null; end if;\n  v_status:=case when coalesce((v_cfg->>'autoConfirmWaitlist')::boolean,true) then 'booked' else 'pending' end;\n  insert into public.basement_bookings(slot_id,member_id,status)\n  values(p_slot_id,v_wait.member_id,v_status) returning id into v_id;\n  update public.basement_waiting_list set status='promoted' where id=v_wait.id;\n  return v_id;\nend $function$\n"
+    },
+    {
+      "proname": "basement_finalize_finished_appointments",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_finalize_finished_appointments()\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_cfg jsonb:='{}'; v_booking record; v_member uuid; v_package uuid; v_done integer:=0;\nbegin\n  select coalesce(value,'{}') into v_cfg from public.app_settings where key='control_center_settings';\n  if not coalesce((v_cfg->>'autoComplete')::boolean,false) then return 0; end if;\n  for v_booking in\n    select b.id,b.member_id,s.ends_at from public.basement_bookings b\n    join public.basement_slots s on s.id=b.slot_id\n    where b.status='booked' and s.ends_at<=now()\n      and s.ends_at>=coalesce((v_cfg->>'autoCheckinStartedAt')::timestamptz,'2026-09-01'::timestamptz)\n    order by s.ends_at,b.id for update of b skip locked\n  loop\n    select id into v_member from public.members where auth_user_id=v_booking.member_id;\n    if v_member is not null and coalesce((v_cfg->>'checkIn')::boolean,true) then\n      insert into public.gym_checkins(member_id,booking_id,checked_in_at,method,notes)\n      values(v_member,v_booking.id,v_booking.ends_at,'automatic','Αυτόματο check-in μετά την ολοκλήρωση') on conflict do nothing;\n    end if;\n    if v_member is not null and not exists(select 1 from public.basement_session_usage where booking_id=v_booking.id) then\n      select id into v_package from public.member_packages\n      where member_id=v_member and status='active' and starts_on<=current_date\n        and expires_on+coalesce((v_cfg->>'maxAutoExtendDays')::integer,0)>=current_date\n        and (frozen_until is null or frozen_until<current_date)\n        and (sessions_remaining is null or sessions_remaining>0)\n      order by expires_on,id limit 1 for update;\n      if v_package is not null then\n        update public.member_packages set sessions_remaining=case when sessions_remaining is null then null else greatest(0,sessions_remaining-1) end where id=v_package;\n        insert into public.basement_session_usage(booking_id,member_package_id,change) values(v_booking.id,v_package,-1);\n      end if;\n    end if;\n    update public.basement_bookings set status='completed',checked_in_at=case when coalesce((v_cfg->>'checkIn')::boolean,true) then coalesce(checked_in_at,v_booking.ends_at) else checked_in_at end,completed_at=now() where id=v_booking.id;\n    v_done:=v_done+1;\n  end loop;\n  return v_done;\nend $function$\n"
+    },
+    {
+      "proname": "basement_audit_changes",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_audit_changes()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_old jsonb; v_new jsonb; v_id text;\nbegin\n  v_old:=case when tg_op='INSERT' then null else to_jsonb(old) end;\n  v_new:=case when tg_op='DELETE' then null else to_jsonb(new) end;\n  v_id:=coalesce(v_new->>'id',v_old->>'id');\n  insert into public.audit_log(actor_id,action,table_name,record_id,old_value,new_value)\n  values(auth.uid(),lower(tg_op),tg_table_name,v_id,v_old,v_new);\n  return coalesce(new,old);\nend $function$\n"
+    },
+    {
+      "proname": "basement_checkin_by_qr",
+      "definition": "CREATE OR REPLACE FUNCTION public.basement_checkin_by_qr(p_qr_token uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare v_actor uuid:=auth.uid();v_member public.members%rowtype;v_checkin_id bigint;v_booking_id bigint;\nbegin\n if v_actor is null or not exists(select 1 from public.profiles where id=v_actor and role in('owner','admin','reception','trainer')) then raise exception 'Δεν επιτρέπεται το check-in.';end if;\n select * into v_member from public.members where qr_token=p_qr_token and active=true;\n if not found then raise exception 'Ο κωδικός δεν αντιστοιχεί σε ενεργό μέλος.';end if;\n select id into v_checkin_id from public.gym_checkins where member_id=v_member.id and checked_in_at>now()-interval '3 hours' order by checked_in_at desc limit 1;\n if v_checkin_id is null then insert into public.gym_checkins(member_id,method,created_by) values(v_member.id,'qr',v_actor) returning id into v_checkin_id;end if;\n select b.id into v_booking_id from public.basement_bookings b join public.basement_slots s on s.id=b.slot_id\n where b.member_id=v_member.auth_user_id and b.status='booked' and s.starts_at between now()-interval '90 minutes' and now()+interval '90 minutes'\n order by abs(extract(epoch from(s.starts_at-now()))) limit 1;\n if v_booking_id is not null then update public.basement_bookings set checked_in_at=coalesce(checked_in_at,now()) where id=v_booking_id;end if;\n return jsonb_build_object('checkin_id',v_checkin_id,'member_id',v_member.id,'member_name',v_member.full_name,'booking_id',v_booking_id);\nend;$function$\n"
+    },
+    {
+      "proname": "is_staff",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_staff()\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  select exists (\r\n    select 1 from public.profiles\r\n    where id = auth.uid()\r\n      and active = true\r\n      and role in ('owner','admin','reception','trainer')\r\n  );\r\n$function$\n"
+    }
+  ]
+}

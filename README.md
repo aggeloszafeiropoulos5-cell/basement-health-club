@@ -1,6 +1,8 @@
-# Basement Health Club Control Center V13
+# Basement Health Club Control Center V35
 
-Η V13 προσθέτει πλήρη επεξεργάσιμη καρτέλα μέλους, οφειλή και ημερομηνία γέννησης, εξαγωγή CSV, ασφαλή χειροκίνητη διόρθωση συνεδριών, ολοκλήρωση/no-show/αναίρεση ραντεβού, audit log και αυτόματη προώθηση λίστας αναμονής.
+Η V35 μεταφέρει την εμφάνιση και το Settings Center του αρχικού GPT Control Center στην υπάρχουσα εφαρμογή Supabase. Περιλαμβάνει καρτέλες μελών, συνεδρίες, ημερήσιο/εβδομαδιαίο ημερολόγιο, CRM, κανόνες διαθεσιμότητας και ασφαλή χρέωση/επιστροφή συνεδρίας. Οδηγίες εγκατάστασης και ακριβές εύρος: `INSTALL-EL.md`.
+
+Reference source: Basement Control Center Site version 10, commit `6cd5d779207f7b7d995bd6d285cef098319ef94a`. The reference Site is not modified. Existing Supabase Auth, member data and booking accounting remain authoritative.
 
 Independent public website, Member Portal and Owner Dashboard for the Basement Health Club.
 
@@ -18,7 +20,7 @@ Member creation is performed only by the owner through a protected server route.
 ## Control Center
 
 - Live overview for members, bookings, active packages and services.
-- 14-day booking calendar with capacity locking and owner controls.
+- Configurable booking horizon, 24-month history, day/week calendar with capacity locking and owner controls.
 - Owner-only member creation, with automatic member-record synchronisation.
 - Package templates, package assignment and remaining-session visibility.
 - Service duration, capacity, booking and waiting-list settings.
