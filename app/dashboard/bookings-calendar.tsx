@@ -3,115 +3,122 @@ import {useCallback,useEffect,useMemo,useState,type CSSProperties} from "react";
 import {api} from "../../lib/supabase-rest";
 
 type Slot={id:number;service:string;starts_at:string;ends_at:string;capacity:number;enabled:boolean;reserved:number};
-type Booking={id:number;slot_id:number;member_id:string;status:string};
-type Member={id:string;full_name:string|null;phone?:string|null;email?:string|null;active?:boolean};
-type CalendarSettings={showEndTime?:boolean;hideZeroCustomer?:boolean;hideZeroAdmin?:boolean;showAvailableSpots?:boolean;pauseBookings?:boolean;colorPerService?:boolean;showServiceName?:boolean;lastNameFirst?:boolean;hatchUnavailable?:boolean;hatchAvailable?:boolean;customCalendar?:boolean;openingTime?:string;closingTime?:string;maxAvailableDate?:string};
-const services=["Όλες","Cross Training","EMS Training","EMS Sculpting","Vacu Power"];
-const greekDate=new Intl.DateTimeFormat("el-GR",{timeZone:"Europe/Athens",weekday:"long",day:"numeric",month:"long"});
-const greekTime=new Intl.DateTimeFormat("el-GR",{timeZone:"Europe/Athens",hour:"2-digit",minute:"2-digit",hour12:false});
+type Booking={id:number;slot_id:number;member_id:string;status:string;payment_status:string;moved_at:string|null;moved_from_slot_id:number|null;notes:string|null;checked_in_at:string|null;completed_at:string|null};
+type Waiting={id:number;slot_id:number;member_id:string;status:string;created_at:string};
+type Member={id:string;member_record_id?:string;full_name:string|null;phone?:string|null;email?:string|null;active?:boolean};
+type MemberPackage={id:string;member_id:string;starts_on:string;expires_on:string;sessions_total:number|null;sessions_remaining:number|null;status:string;package_templates:{name:string}|null};
+type CalendarSettings={showEndTime?:boolean;hideZeroCustomer?:boolean;hideZeroAdmin?:boolean;showAvailableSpots?:boolean;pauseBookings?:boolean;colorPerService?:boolean;showServiceName?:boolean;lastNameFirst?:boolean;hatchUnavailable?:boolean;hatchAvailable?:boolean;customCalendar?:boolean;timeFormat?:string;waitlistEnabled?:boolean;termsPage?:boolean;bookingMessages?:boolean;checkIn?:boolean;paidColor?:boolean;customEditedColor?:boolean;changeServiceOnMove?:boolean};
+const preferredServices=["Cross Training","EMS Training","EMS Sculpting","Vacu Power"];
+const greekDate=new Intl.DateTimeFormat("el-GR",{timeZone:"Europe/Athens",weekday:"long",day:"numeric",month:"long",year:"numeric"});
 const dateParts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Athens",year:"numeric",month:"2-digit",day:"2-digit"});
 const dayKey=(d:string)=>{const p=Object.fromEntries(dateParts.formatToParts(new Date(d)).map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`};
+const statusLabel:Record<string,string>={pending:"Σε αναμονή επιβεβαίωσης",booked:"Επιβεβαιωμένο",completed:"Ολοκληρωμένο · Check-in",no_show:"No-show",late_cancel:"Εκπρόθεσμη ακύρωση",cancelled:"Ακυρωμένο"};
 
-export default function BookingsCalendar({userId,owner,members}:{userId:string;owner:boolean;members:Member[]}){
-  const [slots,setSlots]=useState<Slot[]>([]),[bookings,setBookings]=useState<Booking[]>([]);
-  const [selectedDay,setSelectedDay]=useState(""),[service,setService]=useState("Όλες");
-  const [memberId,setMemberId]=useState(""),[pending,setPending]=useState<number|null>(null);
-  const [selectedSlot,setSelectedSlot]=useState<Slot|null>(null);
+export default function BookingsCalendar({userId,owner,members,onOpenMember}:{userId:string;owner:boolean;members:Member[];onOpenMember?:(authUserId:string)=>void}){
+  const [slots,setSlots]=useState<Slot[]>([]),[bookings,setBookings]=useState<Booking[]>([]),[waiting,setWaiting]=useState<Waiting[]>([]),[packages,setPackages]=useState<MemberPackage[]>([]);
+  const [selectedDay,setSelectedDay]=useState(""),[service,setService]=useState("Όλες"),[memberId,setMemberId]=useState(""),[memberSearch,setMemberSearch]=useState(""),[memberSearchOpen,setMemberSearchOpen]=useState(false);
+  const [pending,setPending]=useState<number|null>(null),[selectedSlot,setSelectedSlot]=useState<Slot|null>(null);
+  const [movingBooking,setMovingBooking]=useState<Booking|null>(null),[moveSlotId,setMoveSlotId]=useState("");
+  const [noteDraft,setNoteDraft]=useState<Record<number,string>>({}),[acceptedTerms,setAcceptedTerms]=useState(false);
+  const [success,setSuccess]=useState(""),[error,setError]=useState(""),[ready,setReady]=useState(false);
   const [settings,setSettings]=useState<CalendarSettings>({showEndTime:true,showAvailableSpots:true,colorPerService:true});
-  const [error,setError]=useState(""),[ready,setReady]=useState(false);
   const token=()=>localStorage.getItem("basement_access_token")||"";
-  async function bookingRows(path:string){
-    const rows:Booking[]=[];
+
+  async function paged<T>(path:string){
+    const rows:T[]=[];
     for(let offset=0;;offset+=1000){
-      const response=await api(`${path}&limit=1000&offset=${offset}`,token());
-      if(!response.ok)throw new Error("Αδυναμία φόρτωσης κρατήσεων.");
-      const page:Booking[]=await response.json();rows.push(...page);
-      if(page.length<1000)return rows;
-    }
-  }
-  async function availabilityRows(){
-    const rows:Slot[]=[];
-    for(let offset=0;;offset+=1000){
-      const response=await api("/rest/v1/rpc/basement_availability",token(),{headers:{Range:`${offset}-${offset+999}`}});
-      if(!response.ok)throw new Error("Αδυναμία φόρτωσης ημερολογίου.");
-      const page:Slot[]=await response.json();rows.push(...page);
-      if(page.length<1000)return rows;
+      const separator=path.includes("?")?"&":"?";
+      const response=await api(`${path}${separator}limit=1000&offset=${offset}`,token(),{headers:{Range:`${offset}-${offset+999}`}});
+      if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.message||"Δεν φορτώθηκαν τα δεδομένα.")}
+      const page:T[]=await response.json();rows.push(...page);if(page.length<1000)return rows;
     }
   }
 
   const refresh=useCallback(async()=>{
-    try {
-    const now=new Date();
-    const [slotRows,rows,config]=await Promise.all([availabilityRows(),bookingRows(`/rest/v1/basement_bookings?select=id,slot_id,member_id,status,basement_slots!inner(starts_at)&status=eq.booked&basement_slots.starts_at=gte.${encodeURIComponent(now.toISOString())}&order=id.asc`),api("/rest/v1/app_settings?key=eq.control_center_settings&select=value",token())]);
-    if(config.ok){const configRows=await config.json();if(configRows[0]?.value)setSettings(configRows[0].value)}
-    setSlots(slotRows);setBookings(rows);setReady(true);setError("");
-    } catch {setError("Δεν ήταν δυνατή η φόρτωση. Έλεγξε τη σύνδεση και δοκίμασε ξανά.");setReady(true)}
-  },[]);
-  useEffect(()=>{void refresh()},[refresh]);
+    try{
+      if(owner)await api("/rest/v1/rpc/basement_auto_complete_due",token(),{method:"POST",body:"{}"});
+      const historyStart=new Date();historyStart.setUTCMonth(historyStart.getUTCMonth()-24);
+      const slotRows=await paged<Slot>("/rest/v1/rpc/basement_availability");
+      setSlots(slotRows);setReady(true);setError("");
+      const jobs:Promise<unknown>[]=[
+        paged<Booking>(`/rest/v1/basement_bookings?select=id,slot_id,member_id,status,payment_status,moved_at,moved_from_slot_id,notes,checked_in_at,completed_at,slot:basement_slots!basement_bookings_slot_id_fkey!inner(starts_at)&status=in.(pending,booked,cancelled,late_cancel,completed,no_show)&slot.starts_at=gte.${encodeURIComponent(historyStart.toISOString())}&order=id.asc`),
+        api("/rest/v1/app_settings?key=eq.control_center_settings&select=value",token()),
+        owner?paged<Waiting>("/rest/v1/basement_waiting_list?select=id,slot_id,member_id,status,created_at&status=eq.waiting&order=created_at.asc"):Promise.resolve([]),
+        owner?paged<MemberPackage>("/rest/v1/member_packages?select=id,member_id,starts_on,expires_on,sessions_total,sessions_remaining,status,package_templates(name)&status=in.(active,scheduled)&order=expires_on.asc"):Promise.resolve([])
+      ];
+      const [bookingResult,configResult,waitingResult,packageResult]=await Promise.allSettled(jobs);
+      if(bookingResult.status==="fulfilled")setBookings(bookingResult.value as Booking[]);else setError("Το ημερολόγιο φορτώθηκε, αλλά όχι όλο το ιστορικό. Πάτησε ανανέωση.");
+      if(configResult.status==="fulfilled"){const response=configResult.value as Response;if(response.ok){const rows=await response.json();if(rows[0]?.value)setSettings(rows[0].value)}}
+      if(waitingResult.status==="fulfilled")setWaiting(waitingResult.value as Waiting[]);
+      if(packageResult.status==="fulfilled")setPackages(packageResult.value as MemberPackage[]);
+    }catch(e){setError(e instanceof Error?e.message:"Δεν φορτώθηκε το ημερολόγιο. Πάτησε ανανέωση.");setReady(true)}
+  },[owner]);
+  useEffect(()=>{void refresh();const interval=window.setInterval(()=>void refresh(),60_000);return()=>window.clearInterval(interval)},[refresh]);
 
-  const days=useMemo(()=>[...new Set(slots.map(s=>dayKey(s.starts_at)))], [slots]);
-  const activeDay=selectedDay&&days.includes(selectedDay)?selectedDay:days[0];
+  const days=useMemo(()=>[...new Set(slots.map(s=>dayKey(s.starts_at)))].sort(),[slots]);
+  const today=dayKey(new Date().toISOString());
+  const activeDay=selectedDay&&days.includes(selectedDay)?selectedDay:(days.find(day=>day>=today)||days.at(-1)||"");
+  const serviceNames=useMemo(()=>{const live=[...new Set(slots.map(s=>s.service))];return [...preferredServices.filter(s=>live.includes(s)),...live.filter(s=>!preferredServices.includes(s))]},[slots]);
   const shown=slots.filter(s=>dayKey(s.starts_at)===activeDay&&(service==="Όλες"||s.service===service)&&!(((owner&&settings.hideZeroAdmin)||(!owner&&settings.hideZeroCustomer))&&Number(s.reserved)>=s.capacity));
-  const visibleServices=services.slice(1).filter(name=>service==="Όλες"||name===service);
+  const visibleServices=serviceNames.filter(name=>service==="Όλες"||name===service);
   const rowTimes=useMemo(()=>[...new Set(shown.map(s=>s.starts_at))].sort((a,b)=>new Date(a).getTime()-new Date(b).getTime()),[shown]);
-  const activeDayIndex=days.indexOf(activeDay);
-  const myBookings=bookings.filter(b=>b.member_id===userId);
-  const displayName=(name:string|null|undefined)=>{if(!name)return "Μέλος";if(!settings.lastNameFirst)return name;const parts=name.trim().split(/\s+/);return parts.length>1?`${parts.at(-1)} ${parts.slice(0,-1).join(" ")}`:name};
+  const activeDayIndex=days.indexOf(activeDay),myBookings=bookings.filter(b=>b.member_id===userId&&["pending","booked"].includes(b.status));
+  const normalizedSearch=memberSearch.trim().toLocaleLowerCase("el");
+  const filteredMembers=members.filter(m=>m.active!==false&&(!normalizedSearch||`${m.full_name||""} ${m.phone||""} ${m.email||""}`.toLocaleLowerCase("el").includes(normalizedSearch))).slice(0,10);
+  const selectedMember=members.find(m=>m.id===memberId);
+  const packagesFor=(authUserId:string)=>{const member=members.find(m=>m.id===authUserId);return member?.member_record_id?packages.filter(p=>p.member_id===member.member_record_id&&["active","scheduled"].includes(p.status)):[]};
+  const packageSummary=(authUserId:string)=>{const rows=packagesFor(authUserId),active=rows.find(p=>p.status==="active")||rows[0];if(!active)return null;const counted=rows.some(p=>p.status==="active")?rows.filter(p=>p.status==="active"):[active],remaining=counted.some(p=>p.sessions_remaining===null)?null:counted.reduce((sum,p)=>sum+Number(p.sessions_remaining||0),0);const expiry=new Date(`${active.expires_on}T12:00:00+03:00`),now=new Date(),todayLocal=new Date(`${dayKey(now.toISOString())}T12:00:00+03:00`),daysLeft=Math.ceil((expiry.getTime()-todayLocal.getTime())/86_400_000);return {name:active.package_templates?.name||"Πακέτο",remaining,total:active.sessions_total,expiresOn:active.expires_on,daysLeft,status:active.status,warning:(remaining!==null&&remaining<=2)||daysLeft<=2}};
+  const formatDate=(value:string)=>new Intl.DateTimeFormat("el-GR",{timeZone:"Europe/Athens",day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${value}T12:00:00+03:00`));
+  const displayName=(name:string|null|undefined)=>{if(!name)return "Μέλος";const member=members.find(m=>m.full_name===name),summary=member?packageSummary(member.id):null,parts=name.trim().split(/\s+/),shownName=settings.lastNameFirst&&parts.length>1?`${parts.at(-1)} ${parts.slice(0,-1).join(" ")}`:name;return summary?`${shownName} · ${summary.remaining===null?"∞":summary.remaining} συν. · ${formatDate(summary.expiresOn)}`:shownName};
   const serviceClass=(name:string)=>name.toLocaleLowerCase("en").replace(/[^a-z]+/g,"-").replace(/(^-|-$)/g,"");
+  const formatTime=(value:string)=>new Intl.DateTimeFormat("el-GR",{timeZone:"Europe/Athens",hour:"2-digit",minute:"2-digit",hour12:settings.timeFormat==="12 ώρες"}).format(new Date(value));
+  const changeDay=(step:number)=>{const next=days[activeDayIndex+step];if(next)setSelectedDay(next)};
 
-  function changeDay(step:number){
-    const next=days[activeDayIndex+step];if(next)setSelectedDay(next);
+  async function rpc(path:string,body:Record<string,unknown>){
+    const response=await api(`/rest/v1/rpc/${path}`,token(),{method:"POST",body:JSON.stringify(body)});
+    if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.message||"Η ενέργεια δεν ολοκληρώθηκε.")}
+    return response;
   }
-
   async function action(slotId:number,bookingId?:number){
-    setError("");setPending(slotId);
-    const path=bookingId?"basement_cancel":"basement_book";
-    const body=bookingId?{p_booking_id:bookingId}:{p_slot_id:slotId,...(owner&&memberId?{p_member_id:memberId}:{})};
-    try {
-      const response=await api(`/rest/v1/rpc/${path}`,token(),{method:"POST",body:JSON.stringify(body)});
-      if(!response.ok){const data=await response.json().catch(()=>({}));setError(data.message||"Η ενέργεια δεν ολοκληρώθηκε.")}
-      else await refresh();
-    } catch {setError("Δεν ήταν δυνατή η σύνδεση. Δοκίμασε ξανά.")}
-    finally {setPending(null)}
+    setError("");setSuccess("");setPending(slotId);
+    if(!bookingId&&!owner&&settings.termsPage&&!acceptedTerms){setError("Πρέπει πρώτα να αποδεχθείς τους όρους κράτησης.");setPending(null);return}
+    try{const response=await rpc(bookingId?"basement_cancel":"basement_book",bookingId?{p_booking_id:bookingId}:{p_slot_id:slotId,...(owner&&memberId?{p_member_id:memberId}:{})});const result=bookingId?null:await response.json().catch(()=>null);setSuccess(typeof result==="number"&&result<0?"Το μέλος μπήκε στη λίστα αναμονής.":bookingId?"Η κράτηση ακυρώθηκε και παραμένει στο ιστορικό.":"Η κράτηση καταχωρίστηκε.");await refresh()}catch(e){setError(e instanceof Error?e.message:"Δεν ήταν δυνατή η σύνδεση.")}finally{setPending(null)}
   }
-
+  async function moveBooking(){
+    if(!movingBooking||!moveSlotId)return;setPending(movingBooking.id);setError("");
+    try{await rpc("basement_move_booking",{p_booking_id:movingBooking.id,p_new_slot_id:Number(moveSlotId)});setSuccess("Το ραντεβού μεταφέρθηκε και κρατήθηκε στο ιστορικό.");setMovingBooking(null);setMoveSlotId("");await refresh()}catch(e){setError(e instanceof Error?e.message:"Η μεταφορά δεν ολοκληρώθηκε.")}finally{setPending(null)}
+  }
   async function toggle(slot:Slot){
-    setPending(slot.id);setError("");
-    try{
-      const response=await api(`/rest/v1/basement_slots?id=eq.${slot.id}`,token(),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled:!slot.enabled})});
-      if(!response.ok)throw new Error("Δεν αποθηκεύτηκε η αλλαγή διαθεσιμότητας.");
-      await refresh();
-    }catch(e){setError(e instanceof Error?e.message:"Δεν ήταν δυνατή η σύνδεση.")}
-    finally{setPending(null)}
+    setPending(slot.id);setError("");try{const response=await api(`/rest/v1/basement_slots?id=eq.${slot.id}`,token(),{method:"PATCH",body:JSON.stringify({enabled:!slot.enabled})});if(!response.ok)throw new Error("Δεν αποθηκεύτηκε η αλλαγή διαθεσιμότητας.");await refresh()}catch(e){setError(e instanceof Error?e.message:"Δεν ήταν δυνατή η σύνδεση.")}finally{setPending(null)}
+  }
+  async function bookingAction(bookingId:number,bookingAction:"complete"|"no_show"|"undo"|"confirm"|"pending"|"paid"|"unpaid"){
+    setPending(bookingId);setError("");try{await rpc("basement_admin_booking_action",{p_booking_id:bookingId,p_action:bookingAction});await refresh()}catch(e){setError(e instanceof Error?e.message:"Η ενέργεια δεν ολοκληρώθηκε.")}finally{setPending(null)}
+  }
+  async function saveNote(booking:Booking){
+    setPending(booking.id);setError("");try{await rpc("basement_update_booking_notes",{p_booking_id:booking.id,p_notes:noteDraft[booking.id]??booking.notes??""});setSuccess("Η σημείωση αποθηκεύτηκε.");await refresh()}catch(e){setError(e instanceof Error?e.message:"Δεν αποθηκεύτηκε η σημείωση.")}finally{setPending(null)}
+  }
+  async function waitingAction(id:number,waitingAction:"promote"|"cancel"){
+    setPending(id);setError("");try{await rpc("basement_admin_waitlist_action",{p_waiting_id:id,p_action:waitingAction});setSuccess(waitingAction==="promote"?"Το μέλος πέρασε στις κρατήσεις.":"Η αναμονή ακυρώθηκε.");await refresh()}catch(e){setError(e instanceof Error?e.message:"Δεν ολοκληρώθηκε η ενέργεια.")}finally{setPending(null)}
   }
 
-  async function adminBookingAction(bookingId:number,bookingAction:"complete"|"no_show"|"undo"){
-    setPending(bookingId);setError("");
-    try{
-      const response=await api("/rest/v1/rpc/basement_admin_booking_action",token(),{method:"POST",body:JSON.stringify({p_booking_id:bookingId,p_action:bookingAction})});
-      if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.message||"Η ενέργεια δεν ολοκληρώθηκε.")}
-      await refresh();
-    }catch(e){setError(e instanceof Error?e.message:"Δεν ήταν δυνατή η σύνδεση.")}
-    finally{setPending(null)}
-  }
-
+  const selectedBookings=selectedSlot?bookings.filter(b=>b.slot_id===selectedSlot.id):[];
+  const selectedWaiting=selectedSlot?waiting.filter(w=>w.slot_id===selectedSlot.id):[];
   return <div className={`calendar-page ${settings.customCalendar?"custom-calendar":"simple-calendar"}`}>
     <div className="calendar-toolbar">
-      <div className="day-nav"><button aria-label="Προηγούμενη ημέρα" disabled={activeDayIndex<=0} onClick={()=>changeDay(-1)}>‹</button><label><span>Ημερομηνία</span><select value={activeDay||""} onChange={e=>setSelectedDay(e.target.value)}>{days.map(d=><option value={d} key={d}>{greekDate.format(new Date(`${d}T12:00:00+03:00`))}</option>)}</select></label><button aria-label="Επόμενη ημέρα" disabled={activeDayIndex<0||activeDayIndex>=days.length-1} onClick={()=>changeDay(1)}>›</button></div>
-      <label className="calendar-filter"><span>Φίλτρα</span><select value={service} onChange={e=>setService(e.target.value)}>{services.map(s=><option key={s}>{s}</option>)}</select></label>
+      <div className="day-nav"><button aria-label="Προηγούμενη ημέρα" disabled={activeDayIndex<=0} onClick={()=>changeDay(-1)}>‹</button><label><span>Ημερομηνία</span><select value={activeDay} onChange={e=>setSelectedDay(e.target.value)}>{days.map(d=><option value={d} key={d}>{greekDate.format(new Date(`${d}T12:00:00+03:00`))}</option>)}</select></label><button aria-label="Επόμενη ημέρα" disabled={activeDayIndex<0||activeDayIndex>=days.length-1} onClick={()=>changeDay(1)}>›</button></div>
+      <label className="calendar-filter"><span>Φίλτρα</span><select value={service} onChange={e=>setService(e.target.value)}><option>Όλες</option>{serviceNames.map(s=><option key={s}>{s}</option>)}</select></label>
       <button className="new-booking" onClick={()=>document.getElementById("calendar-member")?.focus()}>＋ {owner?"Νέο ραντεβού":"Νέα κράτηση"}</button>
       <button className="refresh-calendar" onClick={()=>void refresh()} disabled={pending!==null}>↻</button>
     </div>
-    {!ready&&<p>Φόρτωση προγράμματος…</p>}
-    {error&&<p className="booking-error" role="alert">{error}</p>}
-    {ready&&<>
-      {owner&&<div className="calendar-member-picker"><label htmlFor="calendar-member">Κράτηση για μέλος</label><select id="calendar-member" value={memberId} onChange={e=>setMemberId(e.target.value)}><option value="">Επίλεξε μέλος</option>{members.map(m=><option value={m.id} key={m.id}>{m.full_name||m.id}</option>)}</select></div>}
+    {!ready&&<p>Φόρτωση προγράμματος…</p>}{error&&<p className="booking-error" role="alert">{error}</p>}{success&&<p className="booking-success" role="status">{success}</p>}
+    {ready&&<>{owner&&<div className="calendar-member-picker"><div className="calendar-member-search"><label htmlFor="calendar-member">Κράτηση για μέλος</label><div className="member-search-box"><span aria-hidden="true">⌕</span><input id="calendar-member" value={memberSearch} onFocus={()=>setMemberSearchOpen(true)} onChange={e=>{setMemberSearch(e.target.value);setMemberSearchOpen(true);if(memberId)setMemberId("")}} placeholder="Γράψε όνομα, τηλέφωνο ή email…" autoComplete="off"/>{memberId&&<button type="button" aria-label="Καθαρισμός μέλους" onClick={()=>{setMemberId("");setMemberSearch("");setMemberSearchOpen(true)}}>×</button>}</div>{memberSearchOpen&&!memberId&&<div className="member-search-results">{filteredMembers.length?filteredMembers.map(member=>{const summary=packageSummary(member.id);return <button type="button" key={member.id} onClick={()=>{setMemberId(member.id);setMemberSearch(member.full_name||member.phone||member.email||"");setMemberSearchOpen(false)}}><span><b>{member.full_name||"Μέλος"}</b><small>{member.phone||member.email||"Χωρίς στοιχεία επικοινωνίας"}</small></span><em className={summary?.warning?"warning":""}>{summary?`${summary.remaining===null?"∞":summary.remaining} συνεδρίες · λήξη ${formatDate(summary.expiresOn)}`:"Χωρίς ενεργό πακέτο"}</em></button>}):<p>Δεν βρέθηκε μέλος.</p>}</div>}</div>{selectedMember&&(()=>{const summary=packageSummary(selectedMember.id);return <aside className={`selected-member-summary ${summary?.warning?"warning":""}`}><span><small>ΕΠΙΛΕΓΜΕΝΟ ΜΕΛΟΣ</small><b>{selectedMember.full_name}</b><em>{selectedMember.phone||selectedMember.email||"Χωρίς στοιχεία επικοινωνίας"}</em></span>{summary?<><span><small>ΠΑΚΕΤΟ</small><b>{summary.name}</b><em>{summary.status==="scheduled"?"Προγραμματισμένο":"Ενεργό"}</em></span><span><small>ΥΠΟΛΟΙΠΟ</small><strong>{summary.remaining===null?"∞":summary.remaining}</strong><em>από {summary.total??"∞"} συνεδρίες</em></span><span><small>ΛΗΞΗ</small><b>{formatDate(summary.expiresOn)}</b><em>{summary.daysLeft<0?`Έληξε πριν ${Math.abs(summary.daysLeft)} ημέρες`:summary.daysLeft===0?"Λήγει σήμερα":`Σε ${summary.daysLeft} ημέρες`}</em></span></>:<span className="no-package"><small>ΣΥΝΔΡΟΜΗ</small><b>Χωρίς ενεργό πακέτο</b><em>Η κράτηση μπορεί να περιοριστεί από τις ρυθμίσεις.</em></span>}</aside>})()}</div>}{!owner&&settings.bookingMessages&&<p className="booking-policy">Οι χρόνοι κράτησης, ακύρωσης, μεταφοράς, συνδρομής και αναμονής ελέγχονται αυτόματα.</p>}{!owner&&settings.termsPage&&<label className="booking-terms"><input type="checkbox" checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/> Αποδέχομαι τους όρους κράτησης και ακύρωσης.</label>}
       {shown.length?<div className="calendar-scroll"><div className="calendar-board" style={{"--service-count":visibleServices.length} as CSSProperties}>
         <div className="calendar-head time-head">Ώρα</div>{visibleServices.map(name=>{const serviceSlots=shown.filter(s=>s.service===name),reserved=serviceSlots.reduce((sum,s)=>sum+Number(s.reserved),0),capacity=serviceSlots.reduce((sum,s)=>sum+s.capacity,0);return <div className="calendar-head" key={name}><strong>{name}</strong><small>{reserved}/{capacity}</small></div>})}
-        {rowTimes.flatMap(time=>{const slotAtTime=shown.find(s=>s.starts_at===time),start=greekTime.format(new Date(time)),end=slotAtTime?greekTime.format(new Date(slotAtTime.ends_at)):"";return [<div className="calendar-time" key={`time-${time}`}>{settings.showEndTime&&end?`${start}–${end}`:start}</div>,...visibleServices.map(name=>{const slot=shown.find(s=>s.starts_at===time&&s.service===name);if(!slot)return <div className={`calendar-empty ${settings.hatchUnavailable?"hatched":""}`} key={`${time}-${name}`}/>;const reserved=bookings.filter(b=>b.slot_id===slot.id),free=slot.capacity-Number(slot.reserved),target=owner?memberId:userId,existing=reserved.find(b=>b.member_id===target);const state=!slot.enabled?"closed":free<=0?"full":free<=Math.max(1,Math.floor(slot.capacity/3))?"limited":"available";return <article className={`calendar-slot ${state} service-${serviceClass(slot.service)} ${settings.colorPerService===false?"single-color":""} ${settings.hatchAvailable&&slot.enabled&&free>0?"hatched":""} ${owner?"clickable":""}`} key={slot.id} role={owner?"button":undefined} tabIndex={owner?0:undefined} onClick={owner?()=>setSelectedSlot(slot):undefined} onKeyDown={owner?e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSlot(slot)}}:undefined}><header>{settings.showServiceName!==false&&<strong>{slot.service}</strong>}<span>♟ {slot.reserved}/{slot.capacity}</span></header>{owner&&<ol>{reserved.map(b=><li key={b.id}>{displayName(members.find(m=>m.id===b.member_id)?.full_name)}</li>)}</ol>}{settings.showAvailableSpots!==false&&<div className="slot-status">{!slot.enabled?"Κλειστή ώρα":free>0?`+${free} ${free===1?"θέση":"θέσεις"} διαθέσιμες`:"Πλήρες"}</div>}<div className="slot-actions">{existing?<button className="cancel-booking" disabled={pending!==null} onClick={e=>{e.stopPropagation();void action(slot.id,existing.id)}}>Ακύρωση</button>:<button disabled={!slot.enabled||free<=0||pending!==null||(owner&&!memberId)||settings.pauseBookings} onClick={e=>{e.stopPropagation();void action(slot.id)}}>{settings.pauseBookings?"Παύση":pending===slot.id?"…":"Κράτηση"}</button>}{owner&&<button className="slot-toggle" disabled={pending!==null} onClick={e=>{e.stopPropagation();void toggle(slot)}}>{slot.enabled?"Κλείσιμο":"Άνοιγμα"}</button>}</div></article>})]})}
-      </div></div>:<p>Δεν υπάρχουν ώρες για την επιλεγμένη ημέρα και υπηρεσία.</p>}
-      {!owner&&myBookings.length>0&&<p className="booking-footnote">Έχεις {myBookings.length} ενεργές κρατήσεις. Μπορείς να τις ακυρώσεις από την αντίστοιχη ημέρα.</p>}
-    </>}
-    {owner&&selectedSlot&&<div className="appointment-modal-backdrop" onClick={()=>setSelectedSlot(null)}><section className="appointment-modal" role="dialog" aria-modal="true" aria-label="Διαχείριση ραντεβού" onClick={e=>e.stopPropagation()}><button className="appointment-modal-close" onClick={()=>setSelectedSlot(null)} aria-label="Κλείσιμο">×</button><header><small>ΚΑΡΤΕΛΑ ΡΑΝΤΕΒΟΥ</small><h2>{selectedSlot.service}</h2><p>{greekDate.format(new Date(selectedSlot.starts_at))} · {greekTime.format(new Date(selectedSlot.starts_at))}–{greekTime.format(new Date(selectedSlot.ends_at))}</p><strong>{bookings.filter(b=>b.slot_id===selectedSlot.id).length}/{selectedSlot.capacity} κρατήσεις</strong></header><div className="appointment-member-list">{bookings.filter(b=>b.slot_id===selectedSlot.id).length?bookings.filter(b=>b.slot_id===selectedSlot.id).map(booking=>{const member=members.find(m=>m.id===booking.member_id);return <article className="appointment-member" key={booking.id}><div><h3>{displayName(member?.full_name)}</h3><p>{member?.phone||"Δεν έχει τηλέφωνο"}</p><small>{member?.email||"Δεν έχει email"}</small></div><div className="appointment-member-actions">{member?.phone&&<a href={`tel:${member.phone}`}>☎ Κλήση</a>}<button disabled={pending!==null} onClick={()=>void adminBookingAction(booking.id,"complete")}>✓ Check-in</button><button className="no-show-action" disabled={pending!==null} onClick={()=>void adminBookingAction(booking.id,"no_show")}>No-show</button><button className="cancel-action" disabled={pending!==null} onClick={()=>void action(selectedSlot.id,booking.id)}>Ακύρωση</button></div></article>}):<p className="appointment-empty">Δεν υπάρχει κράτηση σε αυτή την ώρα.</p>}</div><footer><button disabled={pending!==null} onClick={()=>void toggle(selectedSlot)}>{selectedSlot.enabled?"Κλείσιμο ώρας":"Άνοιγμα ώρας"}</button><button onClick={()=>setSelectedSlot(null)}>Κλείσιμο καρτέλας</button></footer></section></div>}
+        {rowTimes.flatMap(time=>{const slotAtTime=shown.find(s=>s.starts_at===time),start=formatTime(time),end=slotAtTime?formatTime(slotAtTime.ends_at):"";return [<div className="calendar-time" key={`time-${time}`}>{settings.showEndTime&&end?`${start}–${end}`:start}</div>,...visibleServices.map(name=>{const slot=shown.find(s=>s.starts_at===time&&s.service===name);if(!slot)return <div className={`calendar-empty ${settings.hatchUnavailable?"hatched":""}`} key={`${time}-${name}`}/>;const slotBookings=bookings.filter(b=>b.slot_id===slot.id),reserved=slotBookings.filter(b=>["pending","booked"].includes(b.status)),free=slot.capacity-reserved.length,target=owner?memberId:userId,existing=reserved.find(b=>b.member_id===target),queue=waiting.filter(w=>w.slot_id===slot.id).length,canWaitlist=settings.waitlistEnabled&&slot.enabled&&free<=0,state=!slot.enabled?"closed":free<=0?"full":free<=Math.max(1,Math.floor(slot.capacity/3))?"limited":"available";return <article className={`calendar-slot ${state} service-${serviceClass(slot.service)} ${settings.colorPerService===false?"single-color":""} ${settings.hatchAvailable&&slot.enabled&&free>0?"hatched":""} ${owner?"clickable":""}`} key={slot.id} role={owner?"button":undefined} tabIndex={owner?0:undefined} onClick={owner?()=>setSelectedSlot(slot):undefined} onKeyDown={owner?e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelectedSlot(slot)}}:undefined}><header>{settings.showServiceName!==false&&<strong>{slot.service}</strong>}<span>♟ {reserved.length}/{slot.capacity}</span></header>{owner&&<ol>{slotBookings.map(b=><li className={`booking-status-${b.status} ${settings.paidColor&&b.payment_status==="paid"?"paid":""} ${settings.customEditedColor&&b.moved_at?"moved":""}`} key={b.id}><span>{displayName(members.find(m=>m.id===b.member_id)?.full_name)}</span>{(b.status!=="booked"||b.payment_status==="paid"||b.moved_at)&&<em>{[statusLabel[b.status]||b.status,b.payment_status==="paid"?"Πληρωμένο":"",b.moved_at?"Μεταφέρθηκε":""].filter(Boolean).join(" · ")}</em>}</li>)}</ol>}{settings.showAvailableSpots!==false&&<div className="slot-status">{!slot.enabled?"Κλειστή ώρα":free>0?`+${free} ${free===1?"θέση":"θέσεις"} διαθέσιμες`:canWaitlist?`Πλήρες · αναμονή ${queue}`:"Πλήρες"}</div>}<div className="slot-actions">{existing?<button className="cancel-booking" disabled={pending!==null} onClick={e=>{e.stopPropagation();void action(slot.id,existing.id)}}>Ακύρωση</button>:<button disabled={!slot.enabled||(!canWaitlist&&free<=0)||pending!==null||(owner&&!memberId)||settings.pauseBookings} onClick={e=>{e.stopPropagation();void action(slot.id)}}>{settings.pauseBookings?"Παύση":canWaitlist?"Λίστα αναμονής":"Κράτηση"}</button>}{owner&&<button className="slot-toggle" disabled={pending!==null} onClick={e=>{e.stopPropagation();void toggle(slot)}}>{slot.enabled?"Κλείσιμο":"Άνοιγμα"}</button>}</div></article>})]})}
+      </div></div>:<p>Δεν υπάρχουν ώρες για την επιλεγμένη ημέρα και υπηρεσία.</p>}{!owner&&myBookings.length>0&&<p className="booking-footnote">Έχεις {myBookings.length} ενεργές κρατήσεις.</p>}</>}
+    {owner&&selectedSlot&&<div className="appointment-modal-backdrop" onClick={()=>setSelectedSlot(null)}><section className="appointment-modal" role="dialog" aria-modal="true" aria-label="Διαχείριση ραντεβού" onClick={e=>e.stopPropagation()}><button className="appointment-modal-close" onClick={()=>setSelectedSlot(null)} aria-label="Κλείσιμο">×</button><header><small>ΚΑΡΤΕΛΑ ΡΑΝΤΕΒΟΥ</small><h2>{selectedSlot.service}</h2><p>{greekDate.format(new Date(selectedSlot.starts_at))} · {formatTime(selectedSlot.starts_at)}–{formatTime(selectedSlot.ends_at)}</p><strong>{selectedBookings.filter(b=>["pending","booked"].includes(b.status)).length}/{selectedSlot.capacity} ενεργές · {selectedWaiting.length} αναμονή</strong></header>
+      <div className="appointment-member-list">{selectedBookings.length?selectedBookings.map(booking=>{const member=members.find(m=>m.id===booking.member_id),active=["pending","booked"].includes(booking.status);return <article className={`appointment-member status-${booking.status} ${booking.payment_status==="paid"?"is-paid":""} ${booking.moved_at?"is-moved":""}`} key={booking.id}><div><span className={`appointment-status status-${booking.status}`}>{statusLabel[booking.status]||booking.status}</span><h3>{displayName(member?.full_name)}</h3><p>{member?.phone||"Δεν έχει τηλέφωνο"}</p><small>{member?.email||"Δεν έχει email"}</small><small>{booking.payment_status==="paid"?"● Πληρωμένο":"○ Απλήρωτο"}{booking.moved_at?" · Μεταφερμένο":""}</small></div><div className="appointment-member-actions">{member?.phone&&<a href={`tel:${member.phone}`}>☎ Κλήση</a>}{onOpenMember&&<button onClick={()=>onOpenMember(booking.member_id)}>Καρτέλα μέλους</button>}{active?<>{booking.status==="pending"&&<button disabled={pending!==null} onClick={()=>void bookingAction(booking.id,"confirm")}>✓ Επιβεβαίωση</button>}{booking.status==="booked"&&settings.checkIn!==false&&<button disabled={pending!==null} onClick={()=>void bookingAction(booking.id,"complete")}>✓ Check-in</button>}<button className="no-show-action" disabled={pending!==null} onClick={()=>void bookingAction(booking.id,"no_show")}>No-show</button><button disabled={pending!==null} onClick={()=>{setMovingBooking(booking);setMoveSlotId("")}}>Μεταφορά</button><button disabled={pending!==null} onClick={()=>void bookingAction(booking.id,booking.payment_status==="paid"?"unpaid":"paid")}>{booking.payment_status==="paid"?"Απλήρωτο":"Πληρωμένο"}</button><button className="cancel-action" disabled={pending!==null} onClick={()=>void action(selectedSlot.id,booking.id)}>Ακύρωση</button></>:<button className="undo-action" disabled={pending!==null} onClick={()=>void bookingAction(booking.id,"undo")}>↶ Αναίρεση</button>}</div><div className="appointment-notes"><textarea value={noteDraft[booking.id]??booking.notes??""} onChange={e=>setNoteDraft(x=>({...x,[booking.id]:e.target.value}))} placeholder="Εσωτερική σημείωση για την κράτηση…"/><button disabled={pending!==null} onClick={()=>void saveNote(booking)}>Αποθήκευση σημείωσης</button></div>{movingBooking?.id===booking.id&&<div className="appointment-move"><select value={moveSlotId} onChange={e=>setMoveSlotId(e.target.value)}><option value="">Επίλεξε νέα ημέρα και ώρα</option>{slots.filter(s=>s.enabled&&new Date(s.starts_at)>new Date()&&(settings.changeServiceOnMove||s.service===selectedSlot.service)&&s.id!==selectedSlot.id&&Number(s.reserved)<s.capacity).map(s=><option key={s.id} value={s.id}>{greekDate.format(new Date(s.starts_at))} · {formatTime(s.starts_at)} · {s.service}</option>)}</select><button disabled={!moveSlotId||pending!==null} onClick={()=>void moveBooking()}>Ολοκλήρωση μεταφοράς</button><button onClick={()=>setMovingBooking(null)}>Άκυρο</button></div>}</article>}):<p className="appointment-empty">Δεν υπάρχει κράτηση σε αυτή την ώρα.</p>}</div>
+      {selectedWaiting.length>0&&<section className="waiting-admin"><h3>Λίστα αναμονής</h3>{selectedWaiting.map((item,index)=>{const member=members.find(m=>m.id===item.member_id);return <div key={item.id}><span><b>{index+1}. {displayName(member?.full_name)}</b><small>{member?.phone||"Χωρίς τηλέφωνο"}</small></span><span><button disabled={pending!==null} onClick={()=>void waitingAction(item.id,"promote")}>Μεταφορά στις κρατήσεις</button><button disabled={pending!==null} onClick={()=>void waitingAction(item.id,"cancel")}>Ακύρωση αναμονής</button></span></div>})}</section>}
+      <footer><button disabled={pending!==null} onClick={()=>void toggle(selectedSlot)}>{selectedSlot.enabled?"Κλείσιμο ώρας":"Άνοιγμα ώρας"}</button><button onClick={()=>setSelectedSlot(null)}>Κλείσιμο καρτέλας</button></footer></section></div>}
   </div>;
 }

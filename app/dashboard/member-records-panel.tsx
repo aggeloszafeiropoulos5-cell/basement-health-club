@@ -4,10 +4,11 @@ import {api} from "../../lib/supabase-rest";
 type Member={id:string;auth_user_id:string;full_name:string;email:string|null;phone:string|null;active:boolean;created_at:string;notes:string|null;qr_token:string;date_of_birth:string|null;debt:number};
 type Details={packages:any[];bookings:any[];checkins:any[];measurements:any[];finances:any[];health:any|null};
 const money=(n:number)=>new Intl.NumberFormat("el-GR",{style:"currency",currency:"EUR"}).format(n);
-export default function MemberRecordsPanel(){
+export default function MemberRecordsPanel({focusAuthUserId=""}:{focusAuthUserId?:string}){
  const [members,setMembers]=useState<Member[]>([]),[selected,setSelected]=useState<Member|null>(null),[details,setDetails]=useState<Details|null>(null),[search,setSearch]=useState(""),[loading,setLoading]=useState(false),[error,setError]=useState(""),[editing,setEditing]=useState(false),[busy,setBusy]=useState(false);
  const token=()=>localStorage.getItem("basement_access_token")||"";
  useEffect(()=>{void api("/rest/v1/members?select=id,auth_user_id,full_name,email,phone,active,created_at,notes,qr_token,date_of_birth,debt&order=full_name",token()).then(async r=>{if(r.ok)setMembers(await r.json());else setError("Δεν φορτώθηκαν οι καρτέλες μελών.")})},[]);
+ useEffect(()=>{if(!focusAuthUserId||!members.length)return;const match=members.find(m=>m.auth_user_id===focusAuthUserId);if(match&&selected?.id!==match.id)void open(match)},[focusAuthUserId,members]);
  async function open(m:Member){setSelected(m);setDetails(null);setLoading(true);setError("");try{const [p,b,c,x,f,h]=await Promise.all([
    api(`/rest/v1/member_packages?member_id=eq.${m.id}&select=id,starts_on,expires_on,sessions_total,sessions_remaining,status,frozen_until,package_templates(name,price)&order=created_at.desc`,token()),
    api(`/rest/v1/basement_bookings?member_id=eq.${m.auth_user_id}&select=id,status,created_at,checked_in_at,completed_at,payment_status,notes,basement_slots(service,starts_at,ends_at)&order=created_at.desc&limit=100`,token()),

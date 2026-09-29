@@ -54,7 +54,7 @@ begin
     where id=p_booking_id;
     if p_action='complete' and v_member is not null then
       insert into public.gym_checkins(member_id,booking_id,method,notes)
-      values(v_member,p_booking_id,'automatic','Ολοκλήρωση από διαχειριστή') on conflict (booking_id) do nothing;
+      values(v_member,p_booking_id,'automatic','Ολοκλήρωση από διαχειριστή') on conflict do nothing;
     end if;
     if v_member is not null and not exists(select 1 from public.basement_session_usage where booking_id=p_booking_id) then
       select id into v_package from public.member_packages

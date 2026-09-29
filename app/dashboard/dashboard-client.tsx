@@ -11,13 +11,13 @@ import OperationsPanel from "./operations-panel";
 import MemberProfilePanel from "./member-profile-panel";
 import MemberRecordsPanel from "./member-records-panel";
 
-type Profile={id:string;full_name:string|null;role:string;phone?:string|null;email?:string|null;active?:boolean};
+type Profile={id:string;full_name:string|null;role:string;phone?:string|null;email?:string|null;active?:boolean;member_record_id?:string};
 const roleLabels:Record<string,string>={owner:"Ιδιοκτήτης",admin:"Διαχειριστής",reception:"Υποδοχή",trainer:"Γυμναστής",customer:"Μέλος"};
 
 export default function DashboardClient(){
   const router=useRouter();
   const [profile,setProfile]=useState<Profile|null>(null),[members,setMembers]=useState<Profile[]>([]);
-  const [tab,setTab]=useState("overview"),[notice,setNotice]=useState(""),[busy,setBusy]=useState(false);
+  const [tab,setTab]=useState("overview"),[notice,setNotice]=useState(""),[busy,setBusy]=useState(false),[memberFocus,setMemberFocus]=useState("");
   const [stats,setStats]=useState({members:"—",bookings:"—",packages:"—",services:"—"});
   const token=()=>localStorage.getItem("basement_access_token")||"";
 
@@ -31,15 +31,15 @@ export default function DashboardClient(){
     const rows=await p.json(),me=rows[0];
     if(!me){logout();return}
     setProfile(me);
-    if(["owner","admin"].includes(me.role)){
-      const m=await api("/rest/v1/members?select=auth_user_id,full_name,email,phone,active&auth_user_id=not.is.null&order=full_name",token());
+    if(["owner","admin","reception"].includes(me.role)){
+      const m=await api("/rest/v1/members?select=id,auth_user_id,full_name,email,phone,active&auth_user_id=not.is.null&order=full_name",token());
       if(!m.ok)throw new Error("Δεν ήταν δυνατή η φόρτωση των μελών.");
       const memberRows=await m.json();
-      setMembers(memberRows.map((member:{auth_user_id:string;full_name:string|null;email?:string|null;phone?:string|null;active?:boolean})=>({id:member.auth_user_id,full_name:member.full_name,email:member.email,phone:member.phone,active:member.active,role:"customer"})));
+      setMembers(memberRows.map((member:{id:string;auth_user_id:string;full_name:string|null;email?:string|null;phone?:string|null;active?:boolean})=>({id:member.auth_user_id,member_record_id:member.id,full_name:member.full_name,email:member.email,phone:member.phone,active:member.active,role:"customer"})));
     }
     const count=async(path:string)=>{const response=await api(path,token(),{method:"HEAD",headers:{Prefer:"count=exact"}});return response.ok?(response.headers.get("content-range")?.split("/")[1]||"0"):"—"};
     const [memberCount,bookingCount,packageCount,serviceCount]=await Promise.all([
-      ["owner","admin"].includes(me.role)?count("/rest/v1/members?select=id&active=eq.true"):Promise.resolve("—"),
+      ["owner","admin","reception"].includes(me.role)?count("/rest/v1/members?select=id&active=eq.true"):Promise.resolve("—"),
       count("/rest/v1/basement_bookings?select=id&status=eq.booked"),
       count("/rest/v1/member_packages?select=id&status=eq.active"),
       count("/rest/v1/services?select=id&active=eq.true"),
@@ -56,15 +56,15 @@ export default function DashboardClient(){
   }
 
   if(!profile)return <main className="loading-page">{notice?<><p role="alert">{notice}</p><button onClick={()=>window.location.reload()}>Δοκίμασε ξανά</button><button onClick={logout}>Επιστροφή στη σύνδεση</button></>:"Φόρτωση Control Center…"}</main>;
-  const owner=["owner","admin"].includes(profile.role);
-  const tabs=[["overview","Επισκόπηση"],["calendar","Ημερολόγιο"],["members","Μέλη"],["packages","Πακέτα"],["profile","Πρόοδος"],["operations","Λειτουργίες"],["settings","Ρυθμίσεις"]].filter(x=>owner||!["members","operations"].includes(x[0]));
+  const owner=["owner","admin"].includes(profile.role),manager=["owner","admin","reception"].includes(profile.role);
+  const tabs=[["overview","Επισκόπηση"],["calendar","Ημερολόγιο"],["members","Μέλη"],["packages","Πακέτα"],["profile","Πρόοδος"],["operations","Λειτουργίες"],["settings","Ρυθμίσεις"]].filter(x=>manager||!["members","operations"].includes(x[0])).filter(x=>owner||x[0]!=="settings");
 
   return <main className="control"><header><div className="brand"><Image src="/basement-logo.jpeg" width={52} height={52} alt="Basement"/><span><b>BASEMENT</b><small>CONTROL CENTER</small></span></div><button onClick={logout}>Αποσύνδεση</button></header><div className="control-body"><aside aria-label="Κύριο μενού">{tabs.map(x=><button key={x[0]} className={tab===x[0]?"active":""} onClick={()=>setTab(x[0])}>{x[1]}</button>)}</aside><section><div className="dashboard-title"><div><h1>Καλώς ήρθες, {profile.full_name||"μέλος"}</h1><p>{owner?"Owner Dashboard · Basement Health Club":"Member Portal · Προσωπικές κρατήσεις"}</p></div><span>{roleLabels[profile.role]||profile.role}</span></div>
   {tab==="overview"&&<><div className="dash-grid"><article><small>Ενεργά μέλη</small><strong>{owner?stats.members:"—"}</strong></article><article><small>Κρατήσεις</small><strong>{stats.bookings}</strong></article><article><small>Ενεργά πακέτα</small><strong>{stats.packages}</strong></article><article><small>Υπηρεσίες</small><strong>{stats.services}</strong></article></div><div className="overview-panels"><article><span className="status-dot">● Η ΣΥΝΔΕΣΗ ΛΕΙΤΟΥΡΓΕΙ</span><h2>Basement Control Center</h2><p>Ο λογαριασμός είναι συνδεδεμένος με τη βάση του Basement. Οι κρατήσεις, τα μέλη και τα πακέτα ενημερώνονται σε πραγματικό χρόνο.</p><button onClick={()=>setTab("calendar")}>Άνοιξε το ημερολόγιο →</button></article><article><span className="kicker">ΓΡΗΓΟΡΕΣ ΕΝΕΡΓΕΙΕΣ</span><h2>{owner?"Διαχείριση επιχείρησης":"Η συνδρομή σου"}</h2><div className="quick-links"><button onClick={()=>setTab("calendar")}>Ημερολόγιο</button>{owner&&<button onClick={()=>setTab("members")}>Νέο μέλος</button>}<button onClick={()=>setTab("packages")}>Πακέτα</button></div></article></div></>}
-  {tab==="calendar"&&<BookingsCalendar userId={profile.id} owner={owner} members={members}/>}
-  {tab==="members"&&owner&&<><div className="panel-title"><div><h2>Μέλη</h2><p>Πλήρης καρτέλα, συνεδρίες, τηλέφωνο, κρατήσεις και ιστορικό.</p></div></div><details className="new-member-drawer"><summary>＋ Δημιουργία νέου μέλους</summary><form className="admin-form" onSubmit={createMember}><label>Ονοματεπώνυμο<input name="full_name" required/></label><label>Email<input name="email" type="email" required/></label><label>Προσωρινός κωδικός<input name="password" type="password" minLength={8} required/></label><label>Τηλέφωνο<input name="phone" inputMode="tel"/></label><button disabled={busy}>{busy?"Δημιουργία…":"Δημιουργία μέλους"}</button>{notice&&<p className="notice" role="status">{notice}</p>}</form></details><MemberRecordsPanel/></>}
-  {tab==="packages"&&<PackagesPanel owner={owner} userId={profile.id}/>}
-  {tab==="operations"&&owner&&<OperationsPanel/>}
+  {tab==="calendar"&&<BookingsCalendar userId={profile.id} owner={manager} members={members} onOpenMember={id=>{setMemberFocus(id);setTab("members")}}/>}
+  {tab==="members"&&manager&&<><div className="panel-title"><div><h2>Μέλη</h2><p>Πλήρης καρτέλα, συνεδρίες, τηλέφωνο, κρατήσεις και ιστορικό.</p></div></div>{owner&&<details className="new-member-drawer"><summary>＋ Δημιουργία νέου μέλους</summary><form className="admin-form" onSubmit={createMember}><label>Ονοματεπώνυμο<input name="full_name" required/></label><label>Email<input name="email" type="email" required/></label><label>Προσωρινός κωδικός<input name="password" type="password" minLength={8} required/></label><label>Τηλέφωνο<input name="phone" inputMode="tel"/></label><button disabled={busy}>{busy?"Δημιουργία…":"Δημιουργία μέλους"}</button>{notice&&<p className="notice" role="status">{notice}</p>}</form></details>}<MemberRecordsPanel focusAuthUserId={memberFocus}/></>}
+  {tab==="packages"&&<PackagesPanel owner={manager} userId={profile.id}/>}
+  {tab==="operations"&&manager&&<OperationsPanel/>}
   {tab==="profile"&&<MemberProfilePanel userId={profile.id}/>}
   {tab==="settings"&&<SettingsPanel owner={owner} profile={{full_name:profile.full_name,role:roleLabels[profile.role]||profile.role}}/>}
   </section></div></main>;

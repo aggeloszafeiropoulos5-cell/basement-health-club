@@ -22,7 +22,7 @@ const D:Record<string,Def[]>={
   ]
 };
 const initial:Values={};
-for(const defs of Object.values(D))for(const d of defs)initial[d.key]=d.kind==="toggle"?!["pauseBookings","guestBooking","newCustomerBooking","hideZeroAdmin","fixedPositions","fixedPositionsAffectCapacity","hideFixedPositions","hatchAvailable","incomeTools","questionnaires","allowDoubleBooking","restrictedCustomers"].includes(d.key):d.kind==="number"?({bookingMinHours:2.5,bookingMaxDays:14,cancelMinMinutes:30,moveMinHours:3,reminderHours:3.5,adminVisibilityDays:60,waitlistConfirmationHours:3,waitlistLimit:2,expiryReminderDays:2,creditsReminder:1}[d.key]??0):d.kind==="time"?(d.key==="openingTime"?"08:30":d.key==="closingTime"?"22:30":"23:00"):d.options?.[0]||"";
+for(const defs of Object.values(D))for(const d of defs)initial[d.key]=d.kind==="toggle"?!["pauseBookings","guestBooking","newCustomerBooking","hideZeroAdmin","fixedPositions","fixedPositionsAffectCapacity","hideFixedPositions","hatchAvailable","incomeTools","questionnaires","allowDoubleBooking","restrictedCustomers"].includes(d.key):d.kind==="number"?({bookingMinHours:2.5,bookingMaxDays:14,cancelMinMinutes:30,moveMinHours:3,reminderHours:3.5,adminVisibilityDays:730,waitlistConfirmationHours:3,waitlistLimit:2,expiryReminderDays:2,creditsReminder:1}[d.key]??0):d.kind==="time"?(d.key==="openingTime"?"08:30":d.key==="closingTime"?"22:30":"23:00"):d.options?.[0]||"";
 Object.assign(initial,{businessName:"BASEMENT HEALTH CLUB",currency:"Συνεδρίες",timeFormat:"24 ώρες"});
 const nav=[['business','Επιχείρηση'],['bookings','Κρατήσεις'],['calendar','Ημερολόγιο'],['automation','Αυτοματισμοί'],['waitlist','Αναμονή'],['subscriptions','Συνδρομές & όρια'],['services','Υπηρεσίες']];
 
