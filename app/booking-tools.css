@@ -1,0 +1,36 @@
+.weekly-report { min-width: 0; color: #f4f2ff; }
+.weekly-report h2 { font-size: 28px; margin-bottom: 8px; }
+.weekly-report p { color: #c8c9d5; line-height: 1.6; }
+.weekly-navigation { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; padding: 16px; border: 1px solid #45405b; border-radius: 12px; background: #181b28; }
+.weekly-navigation label { display: grid; gap: 6px; }
+.weekly-navigation input, .weekly-navigation button, .weekly-report-shortcut { min-height: 44px; border: 1px solid #806099; border-radius: 8px; padding: 8px 12px; color: #fff; background: #30233f; font: inherit; font-weight: 700; }
+.weekly-navigation input { color-scheme: dark; }
+.weekly-navigation button, .weekly-report-shortcut { cursor: pointer; }
+.weekly-navigation button:disabled { opacity: .5; }
+.weekly-report-shortcut { margin: 8px 0; }
+.calendar-controls-hidden > .weekly-report-shortcut { display: none; }
+.weekly-totals { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 20px 0; }
+.weekly-totals article { padding: 18px; border: 1px solid #45405b; background: #171923; border-radius: 12px; }
+.weekly-totals small { font-size: 15px; }
+.weekly-totals strong { display: block; color: #d0b0ff; font-size: 36px; margin-top: 10px; }
+.weekly-table-scroll { overflow-x: auto; border: 1px solid #45405b; border-radius: 12px; }
+.weekly-report table { width: 100%; border-collapse: collapse; background: #171923; font-size: 17px; }
+.weekly-report th, .weekly-report td { padding: 16px; text-align: center; border-bottom: 1px solid #45405b; white-space: nowrap; }
+.weekly-report th:first-child { text-align: left; }
+.weekly-report thead { background: #30233f; }
+.weekly-report tbody td:nth-child(2) { font-weight: 900; color: #d0b0ff; font-size: 24px; }
+.batch-booking-dialog { width: min(720px,calc(100% - 24px)); }
+.batch-booking-dialog input[type=checkbox] { flex: 0 0 22px; width: 22px; height: 22px; min-height: 22px; accent-color: #9046e3; }
+.batch-member-list { max-height: 250px; overflow-y: auto; border: 1px solid #45405b; border-radius: 8px; }
+.batch-member-list label, .batch-booking-dialog .batch-repeat { display: flex; align-items: center; gap: 12px; padding: 10px; margin: 0; min-height: 44px; }
+.batch-member-list label { border-bottom: 1px solid #45405b; }
+.batch-member-list span { min-width: 0; overflow-wrap: anywhere; }
+.batch-member-list small { display: block; font-weight: 400; margin-top: 5px; }
+.batch-weekdays { display: flex; flex-wrap: wrap; gap: 12px; }
+.batch-weekdays label { display: flex; align-items: center; gap: 6px; }
+.batch-booking-dialog fieldset { padding: 12px; border: 1px solid #806099; margin-bottom: 12px; }
+.batch-preview { max-height: 340px; overflow: auto; display: grid; gap: 8px; margin: 14px 0; }
+.batch-preview article { padding: 12px; background: #242736; border-radius: 8px; }
+.batch-preview span { display: block; margin-top: 6px; }
+.batch-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+@media(max-width:700px) { .weekly-totals { grid-template-columns: repeat(2,minmax(0,1fr)); } .weekly-navigation label { flex: 1; } }
