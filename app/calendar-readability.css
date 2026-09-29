@@ -1,0 +1,107 @@
+/* Keep calendar text readable at normal phone zoom; scroll the grid, not the page. */
+.control-body > section:has(.calendar-page) { min-width: 0; }
+.calendar-page { min-width: 0; font-size: 17px; line-height: 1.45; }
+.calendar-page button, .calendar-page input, .calendar-page select,
+.calendar-page textarea { font-family: inherit; }
+.calendar-toolbar { grid-template-columns: minmax(350px, 1fr) minmax(180px, .45fr) auto 52px; }
+.calendar-toolbar select { font-size: 18px; font-weight: 700; }
+.calendar-toolbar select option { background: #202638; color: #fff; }
+.calendar-toolbar button { min-height: 48px; font-size: 17px; }
+.calendar-toolbar .refresh-calendar, .day-nav > button { font-size: 28px; }
+.day-nav { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.day-nav label, .calendar-filter { min-width: 0; }
+.day-nav label { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 6px 10px; }
+.day-nav label span, .calendar-filter span { font-size: 14px; font-weight: 700; color: #cbd3e4; }
+.calendar-member-picker { flex-wrap: wrap; }
+.calendar-member-search { min-width: min(280px, 100%); }
+.calendar-member-picker label { color: #e4e8f2; font-size: 17px; }
+.member-search-box { min-height: 54px; }
+.member-search-box input { min-width: 0; font-size: 18px; font-weight: 700; }
+.member-search-box input::placeholder { color: #b8c0d1; font-weight: 400; }
+.member-search-box button { width: 36px; height: 36px; }
+.member-search-results { top: calc(100% + 6px); }
+.member-search-results > button { font-size: 18px; }
+.member-search-results b { font-weight: 800; }
+.member-search-results small, .member-search-results em { font-size: 15px; line-height: 1.5; }
+.member-search-results small { color: #c1c9da; }
+.selected-member-summary { min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.selected-member-summary > span { min-width: 0; padding: 12px; overflow-wrap: anywhere; }
+.selected-member-summary small { font-size: 12px; letter-spacing: .2px; color: #c5cddd; }
+.selected-member-summary b { font-size: 18px; font-weight: 800; }
+.selected-member-summary strong { font-size: 30px; }
+.selected-member-summary em { font-size: 15px; line-height: 1.4; color: #d3d9e5; }
+.calendar-scroll { max-width: 100%; isolation: isolate; }
+.calendar-board {
+  grid-template-columns: 96px repeat(var(--service-count), minmax(280px, 1fr));
+  min-width: calc(96px + var(--service-count) * 280px);
+}
+.calendar-head { min-height: 76px; flex-direction: column; gap: 2px; padding: 12px 8px; }
+.calendar-head strong, .calendar-head.time-head { font-size: 19px; font-weight: 800; color: #172238; }
+.calendar-head small { font-size: 16px; font-weight: 700; color: #47546b; }
+.calendar-time { padding: 16px 6px; color: #172238; font-size: 20px; line-height: 1.4; font-weight: 800; font-variant-numeric: tabular-nums; }
+.calendar-time-range { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.calendar-time-end { font-size: 17px; color: #36445e; }
+.calendar-slot { min-width: 0; min-height: 190px; padding: 10px; gap: 10px; }
+.calendar-empty { min-height: 190px; }
+.calendar-slot header {
+  align-items: flex-start; padding: 9px; border: 0; border-radius: 6px;
+  background: #08101aa6; color: #fff;
+}
+.calendar-slot header strong { min-width: 0; font-size: 18px; line-height: 1.4; font-weight: 800; overflow-wrap: anywhere; }
+.calendar-slot header span { padding-top: 2px; font-size: 16px; font-weight: 800; }
+.calendar-slot ol {
+  gap: 0; margin: 0; padding: 3px 10px 3px 32px; border-radius: 6px;
+  background: #08101aa6; color: #fff; font-size: 18px; line-height: 1.5;
+}
+.calendar-slot ol:empty { display: none; }
+.calendar-slot ol li { padding: 10px 0; overflow-wrap: anywhere; }
+.calendar-slot ol li + li { border-top: 1px solid #ffffff40; }
+.calendar-slot ol li::marker { font-size: 16px; font-weight: 800; color: #fff; }
+.calendar-slot .calendar-booking-name { display: block; font-size: 18px; font-weight: 800; }
+.calendar-slot .calendar-booking-package { display: grid; gap: 1px; margin-top: 4px; font-size: 15px; line-height: 1.5; font-weight: 700; color: #fff; }
+.calendar-slot ol li em { margin-top: 5px; font-size: 14px; line-height: 1.5; font-weight: 800; text-transform: none; letter-spacing: 0; }
+.calendar-slot .slot-status { padding: 10px 8px; font-size: 16px; line-height: 1.4; background: #f5faff; color: #14304a; }
+.calendar-slot .slot-actions { margin-top: 0; gap: 8px; }
+.calendar-slot .slot-actions button { min-height: 46px; padding: 9px 6px; font-size: 16px; line-height: 1.35; font-weight: 800; background: #101a2ae6; }
+.calendar-slot .slot-actions button:disabled { opacity: 1; background: #263246; color: #bdc6d7; border-color: #8794aa; cursor: not-allowed; }
+.calendar-page .booking-error, .calendar-page .booking-success { font-size: 17px; font-weight: 700; }
+.calendar-page .booking-policy, .calendar-page .booking-terms, .calendar-page > .booking-footnote { font-size: 16px; }
+.calendar-page :is(button, select, input, textarea):focus-visible { outline: 3px solid #e3c9ff; outline-offset: 3px; }
+.calendar-page .appointment-modal { font-size: 17px; }
+.appointment-modal > header small { font-size: 14px; }
+.appointment-modal > header h2 { font-size: 28px; }
+.appointment-modal > header p { color: #d4dae6; font-size: 18px; font-weight: 700; }
+.appointment-modal > header strong { font-size: 18px; }
+.appointment-member { min-width: 0; }
+.appointment-member h3 { font-size: 21px; line-height: 1.45; overflow-wrap: anywhere; }
+.appointment-member p { font-size: 18px; color: #e3e7ef; }
+.appointment-member small { font-size: 16px; line-height: 1.5; color: #c9d1df; overflow-wrap: anywhere; }
+.appointment-status { font-size: 14px; text-transform: none; letter-spacing: 0; }
+.appointment-member.status-cancelled { opacity: 1; }
+.appointment-member-actions button, .appointment-member-actions a,
+.appointment-modal > footer button, .appointment-move button,
+.appointment-notes button, .waiting-admin button { min-height: 46px; font-size: 16px; line-height: 1.4; }
+.appointment-notes textarea, .appointment-move select { font-size: 17px; line-height: 1.5; }
+.waiting-admin small { font-size: 16px; }
+
+@media (max-width: 1250px) {
+  .calendar-toolbar { grid-template-columns: minmax(0, 1fr) 54px; }
+  .day-nav { grid-column: 1 / -1; }
+  .calendar-filter { min-height: 48px; }
+  .calendar-toolbar .new-booking { grid-column: 1 / -1; grid-row: 3; }
+  .calendar-toolbar .refresh-calendar { grid-column: 2; grid-row: 2; }
+  .calendar-member-search, .selected-member-summary { width: 100%; }
+}
+@media (max-width: 600px) {
+  .calendar-board { grid-template-columns: 88px repeat(var(--service-count), 280px); min-width: calc(88px + var(--service-count) * 280px); }
+  .calendar-time { font-size: 20px; }
+  .calendar-head { min-height: 76px; }
+  .calendar-slot, .calendar-empty { min-height: 190px; }
+  .day-nav label span { display: none; }
+  .calendar-filter { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 6px 12px; }
+  .calendar-filter span { font-size: 13px; }
+  .selected-member-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .member-search-results { top: calc(100% + 6px); }
+  .appointment-modal { padding: 20px 14px; }
+  .appointment-modal > header h2 { font-size: 25px; }
+}

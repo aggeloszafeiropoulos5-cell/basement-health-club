@@ -4,7 +4,7 @@ import json
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-output = root / "Basement-Control-Center-V25-APP-NOTIFICATIONS.zip"
+output = root / "Basement-Control-Center-V26-CALENDAR-READABILITY.zip"
 directories = ["app", "lib", "public", "supabase", "tests", "scripts"]
 files = []
 for name in directories:
