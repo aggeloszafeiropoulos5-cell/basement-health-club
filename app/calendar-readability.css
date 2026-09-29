@@ -105,3 +105,77 @@
   .appointment-modal { padding: 20px 14px; }
   .appointment-modal > header h2 { font-size: 25px; }
 }
+
+/* V27: independently adjustable calendar size and collapsible, sticky navigation. */
+.control-body { grid-template-columns: 230px minmax(0, 1fr); }
+.control-body.menu-collapsed { grid-template-columns: 64px minmax(0, 1fr); }
+.control-body > aside {
+  position: sticky; top: 12px; align-self: start; height: max-content;
+  max-height: calc(100dvh - 24px); overflow-y: auto; padding: 16px;
+}
+.control-body.menu-collapsed > aside { padding: 8px; }
+.dashboard-navigation { width: 100%; }
+.dashboard-navigation[hidden] { display: none; }
+.control-body > aside .dashboard-menu-toggle {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; margin: 0 0 12px; padding: 8px;
+  border: 1px solid #725299; background: #252033; color: #fff; font-weight: 800;
+}
+.dashboard-menu-toggle > span:first-child { font-size: 28px; line-height: 1; }
+.menu-collapsed .dashboard-menu-label { display: none; }
+.control-body.menu-collapsed > aside .dashboard-menu-toggle { margin: 0; }
+.control-body > section { min-width: 0; }
+.calendar-size-controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 12px; margin-bottom: 12px; border: 1px solid #514265;
+  border-radius: 12px; background: #171722; color: #fff;
+}
+.calendar-size-controls strong { margin-right: auto; font-size: 16px; }
+.calendar-size-controls button { min-width: 46px; min-height: 46px; padding: 8px 12px; border: 1px solid #8b68b4; border-radius: 8px; background: #39234f; color: #fff; font-size: 24px; font-weight: 800; cursor: pointer; }
+.calendar-size-controls button:disabled { background: #292b35; color: #a1a9b9; border-color: #515866; cursor: not-allowed; }
+.calendar-size-controls output { min-width: 52px; text-align: center; font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.calendar-size-controls .calendar-size-reset { font-size: 15px; }
+.calendar-toolbar { position: sticky; top: 8px; z-index: 25; box-shadow: 0 5px 16px #0007; }
+.calendar-member-picker { position: relative; z-index: 5; }
+.calendar-scroll { max-height: 70vh; max-height: 70dvh; scrollbar-gutter: stable; }
+.calendar-scroll:focus-visible { outline: 3px solid #cda5ff; outline-offset: 2px; }
+.calendar-board {
+  --calendar-time-width: calc(96px * var(--calendar-scale, 1));
+  --calendar-column-width: calc(280px * var(--calendar-scale, 1));
+  grid-template-columns: var(--calendar-time-width) repeat(var(--service-count), minmax(var(--calendar-column-width), 1fr));
+  min-width: calc(var(--calendar-time-width) + var(--service-count) * var(--calendar-column-width));
+}
+.calendar-head { min-height: calc(76px * var(--calendar-scale, 1)); padding: calc(12px * var(--calendar-scale, 1)) 8px; }
+.calendar-head strong, .calendar-head.time-head { font-size: calc(19px * var(--calendar-scale, 1)); }
+.calendar-head small { font-size: calc(16px * var(--calendar-scale, 1)); }
+.calendar-time { font-size: calc(20px * var(--calendar-scale, 1)); }
+.calendar-time-end { font-size: calc(17px * var(--calendar-scale, 1)); }
+.calendar-slot, .calendar-empty { min-height: calc(190px * var(--calendar-scale, 1)); }
+.calendar-slot { padding: calc(10px * var(--calendar-scale, 1)); gap: calc(10px * var(--calendar-scale, 1)); }
+.calendar-slot header strong, .calendar-slot ol, .calendar-slot .calendar-booking-name { font-size: calc(18px * var(--calendar-scale, 1)); }
+.calendar-slot header span, .calendar-slot ol li::marker, .calendar-slot .slot-status, .calendar-slot .slot-actions button { font-size: calc(16px * var(--calendar-scale, 1)); }
+.calendar-slot .calendar-booking-package { font-size: calc(15px * var(--calendar-scale, 1)); }
+.calendar-slot ol li em { font-size: calc(14px * var(--calendar-scale, 1)); }
+.calendar-slot ol li { padding: calc(10px * var(--calendar-scale, 1)) 0; }
+.calendar-slot .slot-status { padding: calc(10px * var(--calendar-scale, 1)) 6px; }
+
+@media (max-width: 800px) {
+  .control-body, .control-body.menu-collapsed { grid-template-columns: minmax(0, 1fr); }
+  .control-body > aside, .control-body.menu-collapsed > aside {
+    top: 0; z-index: 30; display: flex; flex-direction: column;
+    padding: 8px; max-height: 35dvh; width: 100%; overflow: auto;
+  }
+  .control-body > aside .dashboard-menu-toggle { width: auto; margin: 0 0 6px; padding: 8px 14px; }
+  .menu-collapsed .dashboard-menu-label { display: inline; }
+  .dashboard-navigation { display: flex; flex-shrink: 0; gap: 4px; overflow-x: auto; }
+  .control-body > aside .dashboard-navigation button { width: auto; flex: 0 0 auto; margin: 0; }
+  /* Leave room for the menu on smaller screens; the grid headers stay sticky inside it. */
+  .calendar-toolbar { top: 126px; }
+  .menu-collapsed .calendar-toolbar { top: 70px; }
+}
+@media (max-width: 600px) {
+  .calendar-board { --calendar-time-width: calc(88px * var(--calendar-scale, 1)); }
+  .calendar-size-controls { margin: 0 10px 12px; gap: 8px; }
+  .calendar-size-controls strong { width: 100%; }
+  .calendar-toolbar { position: static; }
+}

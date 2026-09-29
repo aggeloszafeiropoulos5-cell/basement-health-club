@@ -1,5 +1,6 @@
 "use client";
 import {useEffect,useState} from "react";
+import {useDisplayPreference} from "../../lib/use-display-preference";
 import {useRouter} from "next/navigation";
 import Image from "next/image";
 import {api} from "../../lib/supabase-rest";
@@ -20,6 +21,7 @@ const roleLabels:Record<string,string>={owner:"Ιδιοκτήτης",admin:"Δι
 
 export default function DashboardClient(){
   const router=useRouter();
+  const [menuCollapsed,setMenuCollapsed]=useDisplayPreference("basement_menu_collapsed",0,0,1);
   const [profile,setProfile]=useState<Profile|null>(null),[members,setMembers]=useState<Profile[]>([]);
   const [tab,setTab]=useState("overview"),[notice,setNotice]=useState(""),[memberFocus,setMemberFocus]=useState("");
   const [memberRevision,setMemberRevision]=useState(0);
@@ -71,7 +73,7 @@ export default function DashboardClient(){
   const owner=["owner","admin"].includes(profile.role),manager=["owner","admin","reception"].includes(profile.role);
   const tabs=[["overview","Επισκόπηση"],["calendar","Ημερολόγιο"],["members","Μέλη"],["packages","Πακέτα"],["profile","Πρόοδος"],["operations","Λειτουργίες"],["settings","Ρυθμίσεις"],["notifications","Εφαρμογή & ειδοποιήσεις"]].filter(x=>manager||!["members","operations"].includes(x[0])).filter(x=>owner||x[0]!=="settings");
 
-  return <main className="control"><header><div className="brand"><Image src="/basement-logo.jpeg" width={52} height={52} alt="Basement"/><span><b>BASEMENT</b><small>CONTROL CENTER</small></span></div><button onClick={()=>void signOut()}>Αποσύνδεση</button></header><div className="control-body"><aside aria-label="Κύριο μενού">{tabs.map(x=><button key={x[0]} className={tab===x[0]?"active":""} onClick={()=>setTab(x[0])}>{x[1]}</button>)}</aside><section><div className="dashboard-title"><div><h1>Καλώς ήρθες, {profile.full_name||"μέλος"}</h1><p>{owner?"Owner Dashboard · Basement Health Club":"Member Portal · Προσωπικές κρατήσεις"}</p></div><span>{roleLabels[profile.role]||profile.role}</span></div>
+  return <main className="control"><header><div className="brand"><Image src="/basement-logo.jpeg" width={52} height={52} alt="Basement"/><span><b>BASEMENT</b><small>CONTROL CENTER</small></span></div><button onClick={()=>void signOut()}>Αποσύνδεση</button></header><div className={`control-body ${menuCollapsed?"menu-collapsed":"menu-expanded"}`}><aside aria-label="Κύριο μενού"><button type="button" className="dashboard-menu-toggle" aria-expanded={!menuCollapsed} aria-controls="dashboard-navigation" aria-label={menuCollapsed?"Άνοιγμα μενού":"Απόκρυψη μενού"} title={menuCollapsed?"Άνοιγμα μενού":"Απόκρυψη μενού"} onClick={()=>setMenuCollapsed(menuCollapsed?0:1)}><span aria-hidden="true">{menuCollapsed?"›":"‹"}</span><span className="dashboard-menu-label">{menuCollapsed?"Μενού":"Απόκρυψη μενού"}</span></button><div id="dashboard-navigation" className="dashboard-navigation" hidden={!!menuCollapsed}>{tabs.map(x=><button key={x[0]} className={tab===x[0]?"active":""} aria-current={tab===x[0]?"page":undefined} onClick={()=>setTab(x[0])}>{x[1]}</button>)}</div></aside><section><div className="dashboard-title"><div><h1>Καλώς ήρθες, {profile.full_name||"μέλος"}</h1><p>{owner?"Owner Dashboard · Basement Health Club":"Member Portal · Προσωπικές κρατήσεις"}</p></div><span>{roleLabels[profile.role]||profile.role}</span></div>
   {notice&&<p className="notice" role="status">{notice}</p>}
   {tab==="notifications"&&<NotificationsPanel userId={profile.id}/>}
   {tab==="overview"&&<><AppInstall/><button className="notification-shortcut" onClick={()=>setTab("notifications")}>Εφαρμογή & ειδοποιήσεις →</button><div className="dash-grid"><article><small>Ενεργά μέλη</small><strong>{owner?stats.members:"—"}</strong></article><article><small>Κρατήσεις</small><strong>{stats.bookings}</strong></article><article><small>Ενεργά πακέτα</small><strong>{stats.packages}</strong></article><article><small>Υπηρεσίες</small><strong>{stats.services}</strong></article></div><div className="overview-panels"><article><span className="status-dot">● Η ΣΥΝΔΕΣΗ ΛΕΙΤΟΥΡΓΕΙ</span><h2>Basement Control Center</h2><p>Ο λογαριασμός είναι συνδεδεμένος με τη βάση του Basement. Οι κρατήσεις, τα μέλη και τα πακέτα ενημερώνονται σε πραγματικό χρόνο.</p><button onClick={()=>setTab("calendar")}>Άνοιξε το ημερολόγιο →</button></article><article><span className="kicker">ΓΡΗΓΟΡΕΣ ΕΝΕΡΓΕΙΕΣ</span><h2>{owner?"Διαχείριση επιχείρησης":"Η συνδρομή σου"}</h2><div className="quick-links"><button onClick={()=>setTab("calendar")}>Ημερολόγιο</button>{owner&&<button onClick={()=>setTab("members")}>Νέο μέλος</button>}<button onClick={()=>setTab("packages")}>Πακέτα</button></div></article></div></>}
