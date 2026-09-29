@@ -1,15 +1,16 @@
 "use client";
-import {FormEvent,useEffect,useState} from "react";
+import {useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 import Image from "next/image";
 import {api} from "../../lib/supabase-rest";
-import {clearSession,memberRequest,SessionExpiredError} from "../../lib/session";
+import {clearSession,SessionExpiredError} from "../../lib/session";
 import BookingsCalendar from "./bookings-calendar";
 import PackagesPanel from "./packages-panel";
 import SettingsPanel from "./settings-panel";
 import OperationsPanel from "./operations-panel";
 import MemberProfilePanel from "./member-profile-panel";
 import MemberRecordsPanel from "./member-records-panel";
+import CreateMemberForm, {CreatedMember} from "./create-member-form";
 
 type Profile={id:string;full_name:string|null;role:string;phone?:string|null;email?:string|null;active?:boolean;member_record_id?:string};
 const roleLabels:Record<string,string>={owner:"Ιδιοκτήτης",admin:"Διαχειριστής",reception:"Υποδοχή",trainer:"Γυμναστής",customer:"Μέλος"};
@@ -17,7 +18,8 @@ const roleLabels:Record<string,string>={owner:"Ιδιοκτήτης",admin:"Δι
 export default function DashboardClient(){
   const router=useRouter();
   const [profile,setProfile]=useState<Profile|null>(null),[members,setMembers]=useState<Profile[]>([]);
-  const [tab,setTab]=useState("overview"),[notice,setNotice]=useState(""),[busy,setBusy]=useState(false),[memberFocus,setMemberFocus]=useState("");
+  const [tab,setTab]=useState("overview"),[notice,setNotice]=useState(""),[memberFocus,setMemberFocus]=useState("");
+  const [memberRevision,setMemberRevision]=useState(0);
   const [stats,setStats]=useState({members:"—",bookings:"—",packages:"—",services:"—"});
   const token=()=>localStorage.getItem("basement_access_token")||"";
 
@@ -48,11 +50,14 @@ export default function DashboardClient(){
   }catch(error){if(error instanceof SessionExpiredError){logout();return}setNotice(error instanceof Error?error.message:"Δεν ήταν δυνατή η σύνδεση.")}})()},[]);
 
   function logout(){clearSession();router.replace("/login")}
-  async function createMember(e:FormEvent<HTMLFormElement>){
-    e.preventDefault();const element=e.currentTarget;setBusy(true);setNotice("");
-    try{const form=new FormData(element);const r=await memberRequest({method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.fromEntries(form))});const data=await r.json();setNotice(r.ok?data.warning||"Το μέλος δημιουργήθηκε επιτυχώς.":data.error||"Δεν ολοκληρώθηκε η εγγραφή.");if(r.ok){element.reset();setMembers(x=>[...x,{id:data.id,full_name:data.full_name,role:data.role}])}}
-    catch(error){setNotice(error instanceof Error&&!(error instanceof TypeError)?error.message:"Δεν επιβεβαιώθηκε η ενέργεια. Έλεγξε πρώτα τη λίστα μελών πριν επαναλάβεις.")}
-    finally{setBusy(false)}
+  function memberCreated(member:CreatedMember){
+    setMembers(current=>[...current.filter(item=>item.id!==member.id),{...member,active:true}]);
+    setMemberFocus(member.id);setMemberRevision(current=>current+1);
+    setStats(current=>({...current,members:current.members==="—"?"—":String(Number(current.members)+1),packages:member.subscription&&current.packages!=="—"?String(Number(current.packages)+1):current.packages}));
+    void api(`/rest/v1/members?auth_user_id=eq.${encodeURIComponent(member.id)}&select=id`,token()).then(async response=>{
+      if(!response.ok)return;const rows=await response.json();
+      if(rows[0]?.id)setMembers(current=>current.map(item=>item.id===member.id?{...item,member_record_id:rows[0].id}:item));
+    }).catch(()=>{});
   }
 
   if(!profile)return <main className="loading-page">{notice?<><p role="alert">{notice}</p><button onClick={()=>window.location.reload()}>Δοκίμασε ξανά</button><button onClick={logout}>Επιστροφή στη σύνδεση</button></>:"Φόρτωση Control Center…"}</main>;
@@ -62,7 +67,7 @@ export default function DashboardClient(){
   return <main className="control"><header><div className="brand"><Image src="/basement-logo.jpeg" width={52} height={52} alt="Basement"/><span><b>BASEMENT</b><small>CONTROL CENTER</small></span></div><button onClick={logout}>Αποσύνδεση</button></header><div className="control-body"><aside aria-label="Κύριο μενού">{tabs.map(x=><button key={x[0]} className={tab===x[0]?"active":""} onClick={()=>setTab(x[0])}>{x[1]}</button>)}</aside><section><div className="dashboard-title"><div><h1>Καλώς ήρθες, {profile.full_name||"μέλος"}</h1><p>{owner?"Owner Dashboard · Basement Health Club":"Member Portal · Προσωπικές κρατήσεις"}</p></div><span>{roleLabels[profile.role]||profile.role}</span></div>
   {tab==="overview"&&<><div className="dash-grid"><article><small>Ενεργά μέλη</small><strong>{owner?stats.members:"—"}</strong></article><article><small>Κρατήσεις</small><strong>{stats.bookings}</strong></article><article><small>Ενεργά πακέτα</small><strong>{stats.packages}</strong></article><article><small>Υπηρεσίες</small><strong>{stats.services}</strong></article></div><div className="overview-panels"><article><span className="status-dot">● Η ΣΥΝΔΕΣΗ ΛΕΙΤΟΥΡΓΕΙ</span><h2>Basement Control Center</h2><p>Ο λογαριασμός είναι συνδεδεμένος με τη βάση του Basement. Οι κρατήσεις, τα μέλη και τα πακέτα ενημερώνονται σε πραγματικό χρόνο.</p><button onClick={()=>setTab("calendar")}>Άνοιξε το ημερολόγιο →</button></article><article><span className="kicker">ΓΡΗΓΟΡΕΣ ΕΝΕΡΓΕΙΕΣ</span><h2>{owner?"Διαχείριση επιχείρησης":"Η συνδρομή σου"}</h2><div className="quick-links"><button onClick={()=>setTab("calendar")}>Ημερολόγιο</button>{owner&&<button onClick={()=>setTab("members")}>Νέο μέλος</button>}<button onClick={()=>setTab("packages")}>Πακέτα</button></div></article></div></>}
   {tab==="calendar"&&<BookingsCalendar userId={profile.id} owner={manager} members={members} onOpenMember={id=>{setMemberFocus(id);setTab("members")}}/>}
-  {tab==="members"&&manager&&<><div className="panel-title"><div><h2>Μέλη</h2><p>Πλήρης καρτέλα, συνεδρίες, τηλέφωνο, κρατήσεις και ιστορικό.</p></div></div>{owner&&<details className="new-member-drawer"><summary>＋ Δημιουργία νέου μέλους</summary><form className="admin-form" onSubmit={createMember}><label>Ονοματεπώνυμο<input name="full_name" required/></label><label>Email<input name="email" type="email" required/></label><label>Προσωρινός κωδικός<input name="password" type="password" minLength={8} required/></label><label>Τηλέφωνο<input name="phone" inputMode="tel"/></label><button disabled={busy}>{busy?"Δημιουργία…":"Δημιουργία μέλους"}</button>{notice&&<p className="notice" role="status">{notice}</p>}</form></details>}<MemberRecordsPanel focusAuthUserId={memberFocus}/></>}
+  {tab==="members"&&manager&&<><div className="panel-title"><div><h2>Μέλη</h2><p>Πλήρης καρτέλα, συνεδρίες, τηλέφωνο, κρατήσεις και ιστορικό.</p></div></div>{owner&&<details className="new-member-drawer"><summary>＋ Δημιουργία νέου μέλους</summary><CreateMemberForm onCreated={memberCreated} onOpenPackages={()=>setTab("packages")}/></details>}<MemberRecordsPanel key={memberRevision} focusAuthUserId={memberFocus}/></>}
   {tab==="packages"&&<PackagesPanel owner={manager} userId={profile.id}/>}
   {tab==="operations"&&manager&&<OperationsPanel/>}
   {tab==="profile"&&<MemberProfilePanel userId={profile.id}/>}

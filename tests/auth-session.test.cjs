@@ -21,7 +21,7 @@ const jwt = (seconds, id = 'owner') => `header.${Buffer.from(JSON.stringify({ ex
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 const session = () => require('../lib/session.ts');
 const route = () => require('../app/api/admin/create-member/route.ts');
-const request = () => new Request('https://club.example/api/admin/create-member', { method: 'POST', headers: { Authorization: `Bearer ${jwt(3600)}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ full_name: 'Test Member', email: 'test@example.invalid', password: 'example-only-password' }) });
+const request = (extra = {}) => new Request('https://club.example/api/admin/create-member', { method: 'POST', headers: { Authorization: `Bearer ${jwt(3600)}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ full_name: 'Test Member', email: 'test@example.invalid', password: 'example-only-password', ...extra }) });
 
 beforeEach(() => {
   for (const filename of Object.keys(require.cache)) if (filename.startsWith(root) && filename.endsWith('.ts')) delete require.cache[filename];
@@ -212,3 +212,97 @@ for (const [name, response] of [
     assert.equal(calls.length, 4);
   });
 }
+
+const templateId = '00000000-0000-4000-8000-000000000001';
+const businessMemberId = '00000000-0000-4000-8000-000000000002';
+const signupPlan = { id: templateId, name: 'EMS 8 / 30', active: true, sessions_total: 8, validity_days: 30 };
+const signupInput = { package_template_id: templateId, package_starts_on: '2026-09-29' };
+
+function subscriptionBackend(options = {}) {
+  const calls = [], saved = [];
+  global.fetch = async (url, init = {}) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) return json({ id: 'owner' });
+    if (url.includes('/profiles?id=eq.owner')) return json([{ role: options.role || 'owner' }]);
+    if (url.includes('/package_templates?')) return options.templateError ? json({}, 503) : json(options.templates ?? [signupPlan]);
+    if (url.endsWith('/auth/v1/admin/users')) return json({ id: 'new-customer' });
+    if (url.includes('/profiles?id=eq.new-customer')) return json([{ id: 'new-customer', full_name: 'Test Member', role: 'customer' }]);
+    if (url.includes('/members?auth_user_id=')) return json(options.noMember ? [] : [{ id: businessMemberId, auth_user_id: 'new-customer' }]);
+    if (url.endsWith('/member_packages') && init.method === 'POST') {
+      if (options.insertError) return json({ message: 'database unavailable' }, 503);
+      const row = JSON.parse(init.body); saved.push(row);
+      if (options.lostResponse) throw new TypeError('response lost after commit');
+      return json([row], 201);
+    }
+    if (url.includes('/member_packages?id=eq.')) return options.readError ? json({}, 503) : json(saved);
+    throw new Error(`Unexpected request ${url}`);
+  };
+  return { calls, saved };
+}
+
+for (const sessions of [8, null]) {
+  test(`creation assigns a ${sessions ?? 'unlimited'}-session package to the business member with server-derived terms`, async () => {
+    const { calls, saved } = subscriptionBackend({ templates: [{ ...signupPlan, sessions_total: sessions }] });
+    const response = await route().POST(request({ ...signupInput, sessions_remaining: 999, expires_on: '2099-12-31', member_id: 'another-member' }));
+    const data = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(data.member_record_id, businessMemberId);
+    assert.equal(data.subscription.sessions_remaining, sessions);
+    assert.equal(data.subscription.expires_on, '2026-10-28');
+    assert.equal(saved[0].member_id, businessMemberId);
+    assert.equal(saved[0].sessions_total, sessions);
+    assert.equal(saved[0].sessions_remaining, sessions);
+    assert.equal(calls.filter(call => call.url.endsWith('/auth/v1/admin/users')).length, 1);
+  });
+}
+
+for (const [name, options, input, status] of [
+  ['inactive package', { templates: [] }, signupInput, 400],
+  ['invalid calendar date', {}, { ...signupInput, package_starts_on: '2026-02-30' }, 400],
+  ['invalid package ID', {}, { ...signupInput, package_template_id: 'not-an-id' }, 400],
+  ['package service outage', { templateError: true }, signupInput, 502],
+  ['invalid package duration', { templates: [{ ...signupPlan, validity_days: 0 }] }, signupInput, 400],
+  ['customer permission', { role: 'customer' }, signupInput, 403],
+]) {
+  test(`${name} is rejected before creating any account or subscription`, async () => {
+    const { calls, saved } = subscriptionBackend(options);
+    const response = await route().POST(request(input));
+    assert.equal(response.status, status);
+    assert.equal(calls.filter(call => call.init.method === 'POST').length, 0);
+    assert.equal(saved.length, 0);
+  });
+}
+
+test('a lost subscription response is recovered with a read without inserting or creating the member twice', async () => {
+  const { calls, saved } = subscriptionBackend({ lostResponse: true });
+  const response = await route().POST(request(signupInput));
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).subscription.id, saved[0].id);
+  assert.equal(saved.length, 1);
+  assert.equal(calls.filter(call => call.init.method === 'POST').length, 2);
+});
+
+for (const options of [{ noMember: true }, { insertError: true }, { lostResponse: true, readError: true }]) {
+  test(`partial creation is explicit and never repeated: ${JSON.stringify(options)}`, async () => {
+    const { calls } = subscriptionBackend(options);
+    const response = await route().POST(request(signupInput));
+    const data = await response.json();
+    assert.equal(response.status, 502);
+    assert.equal(data.account_created, true);
+    assert.equal(data.id, 'new-customer');
+    assert.equal(data.code, 'MEMBER_SUBSCRIPTION_UNCONFIRMED');
+    assert.equal(data.subscription, undefined);
+    assert.equal(calls.filter(call => call.url.endsWith('/auth/v1/admin/users')).length, 1);
+    assert.ok(calls.filter(call => call.url.endsWith('/member_packages') && call.init.method === 'POST').length <= 1);
+  });
+}
+
+test('subscription dates respect Athens midnight, leap years and daylight-saving boundaries', () => {
+  const { athensToday, subscriptionEndDate } = require('../lib/member-subscription.ts');
+  assert.equal(athensToday(new Date('2026-09-29T21:30:00Z')), '2026-09-30');
+  assert.equal(subscriptionEndDate('2028-02-28', 3), '2028-03-01');
+  assert.equal(subscriptionEndDate('2026-10-24', 3), '2026-10-26');
+  assert.equal(subscriptionEndDate('2026-03-28', 3), '2026-03-30');
+  assert.equal(subscriptionEndDate('2026-12-31', 1), '2026-12-31');
+  assert.equal(subscriptionEndDate('2026-02-29', 30), null);
+});
