@@ -1,0 +1,8 @@
+Basement Control Center V38
+
+Διορθώσεις:
+- iPhone/Safari: δεν αποτυγχάνει πλέον η απενεργοποίηση push όταν το getNotifications δεν υποστηρίζεται.
+- Compact ημερολόγιο: δείχνει μόνο έως 2 ονόματα ανά slot.
+- Κρύβονται package/payment/status λεπτομέρειες στο compact view.
+- Κρύβονται status/actions στο compact view ώστε να χωρούν πολύ περισσότερες ώρες στην οθόνη.
+- Πάτημα στο slot συνεχίζει να ανοίγει την πλήρη καρτέλα.

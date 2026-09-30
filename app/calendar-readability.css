@@ -301,3 +301,17 @@
 .calendar-page .calendar-slot-past > .slot-status { background: #dce3ed; color: #253249; }
 .calendar-page .calendar-time.calendar-time-past { background: #d8dee8; color: #253249; }
 .calendar-page .calendar-empty.calendar-empty-past { background: #d8dee8; }
+
+/* V38: compact owner calendar = summary only, so more hours fit on phones. */
+.calendar-compact-rows .calendar-slot,
+.calendar-compact-rows .calendar-empty { min-height: calc(88px * var(--calendar-scale, 1)); }
+.calendar-compact-rows .calendar-slot .slot-status,
+.calendar-compact-rows .calendar-slot .slot-actions { display: none; }
+.calendar-compact-rows .calendar-slot ol { margin: 0; }
+.calendar-compact-rows .calendar-slot .calendar-booking-name {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+@media (max-width: 600px) {
+  .calendar-compact-rows .calendar-slot,
+  .calendar-compact-rows .calendar-empty { min-height: calc(82px * var(--calendar-scale, 1)); }
+}

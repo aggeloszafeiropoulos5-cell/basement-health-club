@@ -35,6 +35,9 @@ export async function disableDevicePush() {
     if (!await subscription.unsubscribe()) throw new Error("Δεν απενεργοποιήθηκαν οι ειδοποιήσεις. Δοκίμασε ξανά πριν αποσυνδεθείς.");
     await pushRequest("unsubscribe", { endpoint }).catch(() => {});
   }
-  (await registration?.getNotifications())?.forEach(notification => notification.close());
+  if (registration && typeof registration.getNotifications === "function") {
+    const notifications = await registration.getNotifications().catch(() => []);
+    notifications.forEach(notification => notification.close());
+  }
   localStorage.removeItem(pushOwnerKey);
 }
