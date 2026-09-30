@@ -1,0 +1,5 @@
+{
+  "checked": 42,
+  "errors": [],
+  "scope": "TypeScript/TSX syntax-transpilation only; NOT a full dependency-resolved type check."
+}

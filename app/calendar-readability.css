@@ -305,8 +305,10 @@
 /* V38: compact owner calendar = summary only, so more hours fit on phones. */
 .calendar-compact-rows .calendar-slot,
 .calendar-compact-rows .calendar-empty { min-height: calc(88px * var(--calendar-scale, 1)); }
+/* V39: hide details, never the primary booking action. */
 .calendar-compact-rows .calendar-slot .slot-status,
-.calendar-compact-rows .calendar-slot .slot-actions { display: none; }
+.calendar-compact-rows .calendar-slot .slot-toggle { display: none; }
+.calendar-compact-rows .calendar-slot .slot-actions { display: flex; }
 .calendar-compact-rows .calendar-slot ol { margin: 0; }
 .calendar-compact-rows .calendar-slot .calendar-booking-name {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;

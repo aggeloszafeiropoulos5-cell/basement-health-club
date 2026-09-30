@@ -1,0 +1,66 @@
+{
+  "runtime": "Offline React 18.2 compatibility runtime (Jupyter distribution); not the React 19.2.3 production runtime",
+  "scope": "Isolated calendar source components; all APIs mocked and all network blocked. Not a Next.js application build.",
+  "tests": [
+    {
+      "test": "mobile compact: visible 44px button → search → member → correct booking and capacity",
+      "result": "PASS"
+    },
+    {
+      "test": "existing members disabled; cancelling selection creates no booking",
+      "result": "PASS"
+    },
+    {
+      "test": "rapid double click sends one booking request",
+      "result": "PASS"
+    },
+    {
+      "test": "server rejection stays visible in chooser; explicit retry works without false success",
+      "result": "PASS"
+    },
+    {
+      "test": "appointment details → add member: closes old sheet, opens chooser and books",
+      "result": "PASS"
+    },
+    {
+      "test": "full-screen bottom booking shortcut → service/time → member",
+      "result": "PASS"
+    },
+    {
+      "test": "keyboard Enter on booking button does not also open the details sheet",
+      "result": "PASS"
+    },
+    {
+      "test": "closed, full and started slots show disabled booking actions",
+      "result": "PASS"
+    },
+    {
+      "test": "reopening a closed slot refreshes the sheet and enables add-member",
+      "result": "PASS"
+    },
+    {
+      "test": "enabled waitlist receives member without increasing reserved capacity",
+      "result": "PASS"
+    },
+    {
+      "test": "paused bookings remain disabled",
+      "result": "PASS"
+    },
+    {
+      "test": "time picker disables full slots instead of failing behind its dialog",
+      "result": "PASS"
+    },
+    {
+      "test": "expand/collapse keeps booking action, toggles only secondary details",
+      "result": "PASS"
+    },
+    {
+      "test": "folded toolbar retains its top booking shortcut",
+      "result": "PASS"
+    },
+    {
+      "test": "booking shortcut is reachable at 320, 390, 768 and 1440px widths",
+      "result": "PASS"
+    }
+  ]
+}

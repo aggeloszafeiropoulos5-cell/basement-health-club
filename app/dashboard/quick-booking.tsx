@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 
 type Candidate={id:string;name:string;contact:string;summary:string;unavailable:boolean};
-export default function QuickBooking({title,members,busy,error,onBook,onClose,onBatch}:{title:string;members:Candidate[];busy:boolean;error:string;onBook:(id:string)=>Promise<boolean>;onClose:()=>void;onBatch?:()=>void}){
+export default function QuickBooking({title,availability,members,busy,error,onBook,onClose,onBatch}:{title:string;availability?:string;members:Candidate[];busy:boolean;error:string;onBook:(id:string)=>Promise<boolean>;onClose:()=>void;onBatch?:()=>void}){
   const dialog=useRef<HTMLDialogElement>(null),lock=useRef(false);
   const [query,setQuery]=useState("");
   const normalize=(text:string)=>text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("el");
@@ -12,7 +12,7 @@ export default function QuickBooking({title,members,busy,error,onBook,onClose,on
   return <dialog ref={dialog} className="quick-booking-dialog" aria-labelledby="quick-booking-title" onCancel={event=>{event.preventDefault();if(!busy)onClose()}}>
     <header><h2 id="quick-booking-title">Επίλεξε μέλος</h2><button type="button" aria-label="Κλείσιμο αναζήτησης" disabled={busy} onClick={onClose}>×</button></header>
     {onBatch&&<button type="button" disabled={busy} onClick={onBatch}>Πολλά μέλη / εβδομαδιαία επανάληψη</button>}
-    <p>{title}</p><label htmlFor="quick-booking-search">Όνομα, τηλέφωνο ή email</label>
+    <p>{title}</p>{availability&&<p className="quick-booking-availability">{availability}</p>}<label htmlFor="quick-booking-search">Όνομα, τηλέφωνο ή email</label>
     <input autoFocus id="quick-booking-search" type="search" autoComplete="off" placeholder="Αναζήτηση μέλους…" value={query} onChange={event=>setQuery(event.target.value)}/>
     <p>Πάτησε το μέλος για καταχώριση στη συγκεκριμένη ώρα.</p>
     {error&&<p role="alert" className="booking-error">{error}</p>}

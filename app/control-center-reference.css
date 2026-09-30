@@ -27,3 +27,61 @@
 @media(max-width:1200px){.reference-workspace{grid-template-columns:1fr}.reference-workspace aside{display:grid;grid-template-columns:1fr 1fr;gap:24px}.reference-service-setting{grid-template-columns:repeat(4,minmax(0,1fr))}.reference-availability-rule{grid-template-columns:repeat(4,minmax(0,1fr))}.reference-theme .calendar-toolbar{gap:8px}.reference-theme .day-nav{flex-basis:100%}.reference-member-tools{flex-wrap:wrap}}
 @media(max-width:800px){.reference-settings-grid{grid-template-columns:1fr}.reference-wide{grid-column:auto}.reference-availability-create{grid-template-columns:repeat(2,minmax(0,1fr))}.reference-theme .control-body>aside{top:auto;max-height:none}.reference-theme .calendar-view-bar{top:0}.reference-panel-head{align-items:flex-start;flex-direction:column}.reference-theme .calendar-controls-hidden .calendar-scroll{max-height:calc(100dvh - 140px)}}
 @media(max-width:650px){.reference-theme .control>header{height:80px;padding:0 18px}.reference-theme .brand img{width:54px;height:54px}.reference-theme .brand b{font-size:16px}.reference-theme .brand small{font-size:10px}.reference-theme .reference-top-label{display:none}.reference-theme .control-body,.reference-theme .control-body.menu-collapsed{padding:20px 12px}.reference-heading{align-items:flex-start;flex-direction:column}.reference-heading>.primary{width:100%}.reference-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.reference-theme .reference-stats button{padding:16px}.reference-stats strong{font-size:34px}.reference-workspace aside{display:block}.reference-settings-card{padding:17px}.reference-mini-grid{grid-template-columns:1fr}.reference-service-setting{grid-template-columns:repeat(2,minmax(0,1fr))}.reference-availability-rule{grid-template-columns:repeat(2,minmax(0,1fr))}.reference-theme .day-nav{flex-wrap:wrap}.reference-theme .day-nav button{padding:6px 9px}.reference-theme .calendar-toolbar .new-booking{flex:1}.reference-theme .calendar-board{--calendar-column-width:calc(220px * var(--calendar-scale,1));--calendar-time-width:calc(68px * var(--calendar-scale,1))}.reference-theme .reference-footer span{display:none}.reference-member-tools input{min-width:0;width:100%}.reference-theme .calendar-view-context{order:0;flex-basis:auto}.reference-theme .calendar-view-bar button{flex:none}.reference-theme .control-body>aside .dashboard-navigation button{padding:8px 12px}}
+
+/* V39: discoverable booking controls in compact and full-screen calendars.
+   The service colours, card summaries and existing booking RPCs are unchanged. */
+.reference-theme .calendar-compact-rows .calendar-slot .slot-actions {
+  display: flex;
+  margin-top: auto;
+  gap: 4px;
+}
+.reference-theme .calendar-compact-rows .calendar-slot .slot-toggle { display: none; }
+.reference-theme .calendar-slot .slot-actions .slot-booking-button {
+  flex: 1;
+  min-height: 44px;
+  padding: 7px 8px;
+  font-size: max(13px, calc(14px * var(--calendar-scale, 1)));
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  background: #0b0d1266;
+  border: 1px solid #ffffff90;
+  border-radius: 7px;
+  touch-action: manipulation;
+}
+.reference-theme .calendar-slot .slot-actions .slot-booking-button:disabled {
+  opacity: .7;
+  cursor: default;
+}
+.reference-theme .calendar-compact-rows .calendar-slot ol { margin: 0; }
+.reference-theme :is(.calendar-view-bar,.calendar-focus-actions) .calendar-new-booking,
+.reference-theme .appointment-add-booking {
+  background: var(--club-primary, #8a43ef);
+  border-color: transparent;
+  color: #fff;
+  min-height: 44px;
+  font-weight: 700;
+}
+.appointment-booking-entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-top: 1px solid #ffffff20;
+}
+.appointment-booking-entry > span { flex: 1 1 180px; font-size: 14px; }
+.appointment-booking-entry > button { flex: 0 1 auto; }
+.reference-theme .quick-booking-availability {
+  padding: 9px 12px;
+  border: 1px solid #ffffff30;
+  border-radius: 7px;
+  color: #f6f5f8;
+  background: #222631;
+}
+@media (max-width: 600px) {
+  .appointment-booking-entry > button { width: 100%; }
+  /* Leave the last row scrollable above the two-row mobile control bar. */
+  .calendar-focus .calendar-board { padding-bottom: 148px; }
+  .calendar-page.calendar-focus .calendar-scroll { scroll-padding-bottom: 148px; }
+}
