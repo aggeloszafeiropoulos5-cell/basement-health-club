@@ -1,3 +1,15 @@
+# Basement Control Center — V43 SETTINGS COMPLETE
+
+Η V43 είναι η νέα πλήρης βάση. Συνδέει τις προηγουμένως παθητικές ρυθμίσεις με το booking backend, το ημερολόγιο, το Member Portal, το waiting list, το CRM και τις λειτουργίες προσωπικού.
+
+- Αλλαγές V43: `V43-CHANGES.md`
+- Έλεγχοι V43: `V43-TEST-REPORT.md`
+- Migration: `supabase/migrations/20260930090000_v43_settings_complete.sql`
+- Οι V43 backend αλλαγές έχουν ήδη εφαρμοστεί στο συνδεδεμένο production Supabase project.
+- Για να εμφανιστεί το νέο frontend στο live site χρειάζεται deployment της V43.
+
+---
+
 # Basement Control Center — V39 FULL FIXED
 
 Πλήρες project, βασισμένο στη V38. Επαναφέρει την προσβάσιμη κράτηση μέσα στις μικρές καρτέλες και προσθέτει κοινή ροή επιλογής μέλους στην καρτέλα ραντεβού και στις μπάρες του ημερολογίου.

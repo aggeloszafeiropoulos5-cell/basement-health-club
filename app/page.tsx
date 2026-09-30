@@ -1,6 +1,7 @@
 import Image from "next/image";
 import HomeLogin from "./home-login";
 import AppInstall from "./app-install";
+import PublicSiteDynamic from "./public-site-dynamic";
 
 const services=[
   {name:"Cross Training",tag:"Δύναμη · αντοχή · ομάδα",what:"Ομαδική λειτουργική προπόνηση με βάρη, ασκήσεις ενδυνάμωσης και conditioning, με καθοδήγηση προπονητή.",benefits:["Βελτίωση δύναμης και φυσικής κατάστασης","Μικρά τμήματα και επίβλεψη","Ποικιλία στην προπόνηση"]},
@@ -31,7 +32,7 @@ export default function Home(){return <main>
 
   <section className="reviews-section"><div className="section-heading"><div><span className="kicker">ΑΞΙΟΛΟΓΗΣΕΙΣ</span><h2>Τι λένε τα μέλη μας</h2></div><div className="rating-badge"><strong>5.0</strong><span>★★★★★</span><small>Google reviews</small></div></div><div className="review-grid">{reviews.map(r=><article key={r.name}><div className="stars">★★★★★</div><p>“{r.text}”</p><footer><b>{r.name}</b><span>{r.source}</span></footer></article>)}</div><div className="review-actions"><a target="_blank" rel="noreferrer" href="https://www.google.com/maps/search/?api=1&query=THE%20BASEMENT%20HEALTH%20CLUB%20Petroupoli">Δες όλες τις αξιολογήσεις</a><a className="primary-link" target="_blank" rel="noreferrer" href="https://www.google.com/maps/search/?api=1&query=THE%20BASEMENT%20HEALTH%20CLUB%20Petroupoli">Γράψε αξιολόγηση →</a></div></section>
 
-  <section className="contact-section"><div><span className="kicker">ΒΡΕΣ ΜΑΣ</span><h2>Basement Health Club</h2><p>Ι. Ξενίδη 5, Πετρούπολη 132 31</p><p><a href="tel:+306983389353">698 338 9353</a></p></div><div className="contact-links"><a target="_blank" rel="noreferrer" href="https://www.google.com/maps/search/?api=1&query=THE%20BASEMENT%20HEALTH%20CLUB%20Petroupoli">Google Maps ↗</a><a target="_blank" rel="noreferrer" href="https://www.instagram.com/">Instagram ↗</a><a target="_blank" rel="noreferrer" href="https://www.facebook.com/">Facebook ↗</a></div></section>
+  <PublicSiteDynamic/>
 
   <section id="portal" className="portal"><div><span>ΓΙΑ ΤΑ ΜΕΛΗ</span><h2>Οι κρατήσεις σου σε ένα σημείο.</h2><p>Η δημόσια σελίδα δεν εμφανίζει live ώρες ή πληρότητα. Τα μέλη συνδέονται με τον λογαριασμό τους για κρατήσεις και διαχείριση ραντεβού.</p></div><HomeLogin className="login" label="Σύνδεση μέλους"/></section>
   <footer className="site-footer"><div className="brand"><Image src="/basement-logo.jpeg" width={50} height={50} alt=""/><span><b>BASEMENT</b><small>HEALTH CLUB</small></span></div><p>© 2015–2026 Basement Health Club · Πετρούπολη</p></footer>
