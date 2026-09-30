@@ -1,6 +1,7 @@
 "use client";
 import {useCallback,useEffect,useMemo,useState,type CSSProperties} from "react";
 import {api} from "../../lib/supabase-rest";
+import {SessionExpiredError,clearSession} from "../../lib/session";
 import {useControlTheme} from "../../lib/control-theme";
 import {appointmentColor,shiftDay} from "../../lib/reference-calendar";
 import AppointmentLauncher from "./appointment-launcher";
@@ -66,32 +67,50 @@ export default function BookingsCalendar({userId,owner,members,onOpenMember,onOp
   }
 
   const refresh=useCallback(async()=>{
+    // V41 performance: render the calendar as soon as slots + current bookings arrive.
+    // Billing/CRM metadata is deliberately loaded afterwards and must never block the grid.
     setBillingReady(false);
     try{
-      if(owner)await api("/rest/v1/rpc/basement_auto_complete_due",token(),{method:"POST",body:"{}"});
-      const historyStart=new Date();historyStart.setUTCMonth(historyStart.getUTCMonth()-24);
-      const slotRows=await paged<Slot>("/rest/v1/rpc/basement_availability");
-      setSlots(slotRows);setReady(true);setError("");
-      const jobs:Promise<unknown>[]=[
-        paged<Booking>(`/rest/v1/basement_bookings?select=id,slot_id,member_id,status,payment_status,paid_at,credit_policy,moved_at,moved_from_slot_id,notes,checked_in_at,completed_at,slot:basement_slots!basement_bookings_slot_id_fkey!inner(starts_at)&status=in.(pending,booked,cancelled,late_cancel,completed,no_show)&slot.starts_at=gte.${encodeURIComponent(historyStart.toISOString())}&order=id.asc`),
-        api("/rest/v1/app_settings?key=eq.control_center_settings&select=value",token()),
-        owner?paged<Waiting>("/rest/v1/basement_waiting_list?select=id,slot_id,member_id,status,created_at&status=eq.waiting&order=created_at.asc"):Promise.resolve([]),
-        owner?paged<MemberPackage>("/rest/v1/member_packages?select=id,member_id,starts_on,expires_on,sessions_total,sessions_remaining,status,frozen_until,package_templates(name,package_template_services(services(name)))&order=expires_on.asc"):Promise.resolve([])
-        ,owner?paged<CreditUsage>("/rest/v1/basement_session_usage?select=booking_id,member_package_id,change,refunded_at&order=id.asc"):Promise.resolve([]),
-        owner?paged<MemberFinance>("/rest/v1/rpc/basement_calendar_member_finances"):Promise.resolve([])
-      ];
-      const [bookingResult,configResult,waitingResult,packageResult,usageResult,financeResult]=await Promise.allSettled(jobs);
-      if(bookingResult.status==="fulfilled")setBookings(bookingResult.value as Booking[]);else setError("Το ημερολόγιο φορτώθηκε, αλλά όχι όλο το ιστορικό. Πάτησε ανανέωση.");
+      if(owner)void api("/rest/v1/rpc/basement_auto_complete_due",token(),{method:"POST",body:"{}"}).catch(()=>{});
+      const historyStart=new Date();historyStart.setUTCDate(historyStart.getUTCDate()-45);
+      const [slotResult,configResult]=await Promise.allSettled([
+        paged<Slot>("/rest/v1/rpc/basement_availability"),
+        api("/rest/v1/app_settings?key=eq.control_center_settings&select=value",token())
+      ]);
+      if(slotResult.status!=="fulfilled")throw slotResult.reason;
+      setSlots(slotResult.value);setReady(true);setError("");
       if(configResult.status==="fulfilled"){const response=configResult.value as Response;if(response.ok){const rows=await response.json();if(rows[0]?.value)setSettings(rows[0].value)}}
-      if(waitingResult.status==="fulfilled")setWaiting(waitingResult.value as Waiting[]);
-      if(packageResult.status==="fulfilled")setPackages(packageResult.value as MemberPackage[]);
-      if(usageResult.status==="fulfilled")setUsage(usageResult.value as CreditUsage[]);
-      if(financeResult.status==="fulfilled")setFinances(financeResult.value as MemberFinance[]);
-      const complete=[bookingResult,packageResult,usageResult,financeResult].every(r=>r.status==="fulfilled");setBillingReady(complete);
-      if(owner&&!complete)setError("Δεν ανανεώθηκαν όλα τα υπόλοιπα και οι πληρωμές. Πάτησε ανανέωση πριν από νέα χρέωση.");
-    }catch(e){setError(e instanceof Error?e.message:"Δεν φορτώθηκε το ημερολόγιο. Πάτησε ανανέωση.");setReady(true)}
+
+      const bookingResult=await Promise.allSettled([
+        paged<Booking>(`/rest/v1/basement_bookings?select=id,slot_id,member_id,status,payment_status,paid_at,credit_policy,moved_at,moved_from_slot_id,notes,checked_in_at,completed_at,slot:basement_slots!basement_bookings_slot_id_fkey!inner(starts_at)&status=in.(pending,booked,cancelled,late_cancel,completed,no_show)&slot.starts_at=gte.${encodeURIComponent(historyStart.toISOString())}&order=id.asc`),
+        owner?paged<Waiting>("/rest/v1/basement_waiting_list?select=id,slot_id,member_id,status,created_at&status=eq.waiting&order=created_at.asc"):Promise.resolve([])
+      ]);
+      if(bookingResult[0].status==="fulfilled")setBookings(bookingResult[0].value);else setError("Το ημερολόγιο άνοιξε, αλλά οι κρατήσεις δεν ανανεώθηκαν. Πάτησε ανανέωση.");
+      if(bookingResult[1].status==="fulfilled")setWaiting(bookingResult[1].value);
+
+      if(owner){
+        void Promise.allSettled([
+          paged<MemberPackage>("/rest/v1/member_packages?select=id,member_id,starts_on,expires_on,sessions_total,sessions_remaining,status,frozen_until,package_templates(name,package_template_services(services(name)))&status=in.(active,scheduled)&order=expires_on.asc"),
+          paged<CreditUsage>(`/rest/v1/basement_session_usage?select=booking_id,member_package_id,change,refunded_at,booking:basement_bookings!inner(slot:basement_slots!inner(starts_at))&booking.slot.starts_at=gte.${encodeURIComponent(historyStart.toISOString())}&order=id.asc`),
+          paged<MemberFinance>("/rest/v1/rpc/basement_calendar_member_finances")
+        ]).then(([packageResult,usageResult,financeResult])=>{
+          if(packageResult.status==="fulfilled")setPackages(packageResult.value);
+          if(usageResult.status==="fulfilled")setUsage(usageResult.value);
+          if(financeResult.status==="fulfilled")setFinances(financeResult.value);
+          setBillingReady([packageResult,usageResult,financeResult].every(r=>r.status==="fulfilled"));
+        });
+      }else setBillingReady(true);
+    }catch(e){
+      if(e instanceof SessionExpiredError){
+        clearSession();
+        const target=encodeURIComponent("calendar");
+        window.location.assign(`/login?tab=${target}`);
+        return;
+      }
+      setError(e instanceof Error?e.message:"Δεν φορτώθηκε το ημερολόγιο. Πάτησε ανανέωση.");setReady(true)
+    }
   },[owner]);
-  useEffect(()=>{void refresh();const changed=()=>void refresh();window.addEventListener("basement-settings-changed",changed);const interval=window.setInterval(()=>void refresh(),60_000);return()=>{window.clearInterval(interval);window.removeEventListener("basement-settings-changed",changed)}},[refresh]);
+  useEffect(()=>{void refresh();const changed=()=>void refresh();window.addEventListener("basement-settings-changed",changed);const interval=window.setInterval(()=>void refresh(),180_000);return()=>{window.clearInterval(interval);window.removeEventListener("basement-settings-changed",changed)}},[refresh]);
 
   const today=dayKey(new Date(now).toISOString());
   const days=useMemo(()=>[...new Set([today,...slots.map(s=>dayKey(s.starts_at))])].sort(),[slots,today]);
