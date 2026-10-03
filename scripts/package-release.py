@@ -4,7 +4,7 @@ import json
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-output = root / "Basement-Control-Center-V39-FULL-FIXED.zip"
+output = root / "Basement-Control-Center-V47-AUDIT-FIXED.zip"
 directories = ["app", "lib", "public", "supabase", "tests", "scripts"]
 files = []
 for name in directories:
@@ -12,7 +12,7 @@ for name in directories:
         relative = file.relative_to(root)
         if file.is_file() and not any(part.startswith(".") or part == "node_modules" or part == "__pycache__" for part in relative.parts):
             files.append(file)
-for name in ["package.json", "package-lock.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "tsconfig.json", "next.config.ts", "next-env.d.ts", "vercel.json", "README.md", "INSTALL-EL.md", "PUSH-OPERATIONS.md", "V38-CHANGES.txt", "V39-CHANGES.md", "V39-TEST-REPORT.md", "V39-MANIFEST.json"]:
+for name in ["package.json", "package-lock.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "requirements-test.txt", "tsconfig.json", "next.config.ts", "next-env.d.ts", "vercel.json", "README.md", "INSTALL-EL.md", "PUSH-OPERATIONS.md", "V38-CHANGES.txt", "V39-CHANGES.md", "V39-TEST-REPORT.md", "V39-MANIFEST.json", "V41-CHANGES.md", "V42-CHANGES.md", "V43-CHANGES.md", "V43-TEST-REPORT.md", "V45-CHANGES.md", "V45-TEST-REPORT.md", "NUTRITION-INSTALL-EL.md", "V47-CHANGES.md", "V47-AUDIT-REPORT.md"]:
     file = root / name
     if file.exists():
         files.append(file)
