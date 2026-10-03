@@ -1,6 +1,6 @@
 export const nutritionDays=["Δευτέρα","Τρίτη","Τετάρτη","Πέμπτη","Παρασκευή","Σάββατο","Κυριακή"];
 export type Meal={name:string;time:string;food:string;quantity:string;alternative:string;kcal:string;protein:string;carbs:string;fat:string};
-export type NutritionContent={goal:string;preferences:string;notes:string;days:Meal[][]};
+export type NutritionContent={goal:string;preferences:string;notes:string;days:Meal[][];aiPlan?:unknown;aiIntake?:unknown;aiTargets?:unknown;shoppingList?:Array<{category:string;items:Array<{name:string;quantity:string}>}>};
 export type NutritionPlan={id:string;member_id:string;title:string;starts_on:string;ends_on:string|null;status:"draft"|"published"|"archived";content:NutritionContent;revision:number;updated_at:string};
 export const newMeal=(name="Γεύμα"):Meal=>({name,time:"",food:"",quantity:"",alternative:"",kcal:"",protein:"",carbs:"",fat:""});
 export const newNutrition=():NutritionContent=>({goal:"",preferences:"",notes:"",days:nutritionDays.map(()=>[newMeal("Πρωινό"),newMeal("Μεσημεριανό"),newMeal("Βραδινό")])});

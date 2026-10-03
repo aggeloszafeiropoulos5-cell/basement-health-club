@@ -85,3 +85,4 @@
   .calendar-focus .calendar-board { padding-bottom: 148px; }
   .calendar-page.calendar-focus .calendar-scroll { scroll-padding-bottom: 148px; }
 }
+.measurement-history{display:grid;gap:7px;margin-top:12px}.measurement-history>div{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:8px;padding:8px;border-top:1px solid #ffffff18;font-size:12px}.measurement-history time{font-weight:800;color:#d5b7fa}@media(max-width:600px){.measurement-history>div{grid-template-columns:1fr 1fr}}
