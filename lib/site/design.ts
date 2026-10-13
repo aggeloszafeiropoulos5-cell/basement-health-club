@@ -1,7 +1,8 @@
 import type {SiteDocument,Section} from './model';
+import {serviceCopy} from './service-copy';
 
 /** Editable defaults applied once; subsequent owner edits and removals take priority. */
-export function upgradeSiteDesign(input:SiteDocument):SiteDocument {
+function upgradeLayout(input:SiteDocument):SiteDocument {
  const d=structuredClone(input);
  if(d.designVersion===53)return d;
  const applyVideo=()=>{
@@ -36,4 +37,19 @@ export function upgradeSiteDesign(input:SiteDocument):SiteDocument {
  if(!d.media.some(m=>m.id==='basement-hero-52')&&hero?.media[0]?.id==='basement-hero-52')d.media.push(hero.media[0]);
  applyVideo();
  return d;
+}
+
+/** Same content migration is used by the public page and the owner editor. */
+export function upgradeSiteDesign(input:SiteDocument):SiteDocument{
+ const d=upgradeLayout(input);
+ if(d.contentVersion===58)return d;
+ for(const item of d.services){const copy=serviceCopy[item.slug||''];if(copy)Object.assign(item,structuredClone(copy));}
+ const clean=(value:string)=>value.replace(/[↗↘↙↖→←↑↓➡⬅⬆⬇↔↕]/gu,'').replace(/\ufe0f/gu,'').trim();
+ const cleanButtons=(buttons:{label:string}[])=>buttons.forEach(b=>b.label=clean(b.label));
+ cleanButtons(d.navigation);cleanButtons(d.footerLinks);
+ for(const page of d.pages){for(const s of page.sections){cleanButtons(s.buttons);s.items.forEach(i=>{i.title=clean(i.title);if(i.body)i.body=clean(i.body);});if(s.type==='services'){s.title='Η προπόνηση που σου ταιριάζει.';s.body='Διάλεξε τον τρόπο που σου δίνει κίνητρο. Από τη δύναμη και το δυναμικό cardio μέχρι την τεχνολογία EMS, η ομάδα του Basement σε βοηθά να βρεις το πρόγραμμα για τον δικό σου στόχο.';}}
+  if(page.serviceId){const service=d.services.find(s=>s.id===page.serviceId);if(service?.body)page.seo.description=service.body;}
+ }
+ d.services.forEach(s=>cleanButtons(s.buttons||[]));d.offers.forEach(o=>cleanButtons(o.buttons||[]));
+ d.contentVersion=58;return d;
 }
