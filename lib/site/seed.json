@@ -1,0 +1,549 @@
+{
+  "schemaVersion": 1,
+  "branding": {
+    "name": "BASEMENT",
+    "subtitle": "HEALTH CLUB · EST. 2015",
+    "logo": {
+      "id": "logo",
+      "url": "/basement-logo.jpeg",
+      "type": "image",
+      "alt": "Basement Health Club",
+      "fit": "cover",
+      "position": "50% 50%"
+    },
+    "footerSubtitle": "HEALTH CLUB",
+    "copyright": "© 2015–2026 Basement Health Club · Πετρούπολη"
+  },
+  "theme": {
+    "accent": "#8a43ef",
+    "background": "#080a0e",
+    "text": "#f6f5f8",
+    "font": "Arial",
+    "buttonRadius": 8
+  },
+  "contact": {
+    "name": "BASEMENT HEALTH CLUB",
+    "phone": "6983389353",
+    "email": "",
+    "address": "Ι. Ξενίδη 5, Πετρούπολη 132 31",
+    "maps": "https://www.google.com/maps/search/?api=1&query=THE%20BASEMENT%20HEALTH%20CLUB%20Petroupoli"
+  },
+  "bookup": {
+    "url": "https://www.basementhealthclub.bookup.gr/",
+    "ios": "https://apps.apple.com/app/id6621263567",
+    "android": "https://play.google.com/store/apps/details?id=gr.bookup.basementhealthclub.www.twa",
+    "label": "ΚΛΕΙΣΕ ΡΑΝΤΕΒΟΥ",
+    "fontSize": 0,
+    "padding": 0,
+    "width": 0
+  },
+  "navigation": [],
+  "footerLinks": [],
+  "social": {
+    "instagram": "",
+    "facebook": "",
+    "tiktok": "",
+    "youtube": "",
+    "whatsapp": ""
+  },
+  "pages": [
+    {
+      "id": "home",
+      "slug": "",
+      "title": "Αρχική σελίδα",
+      "visible": true,
+      "seo": {
+        "title": "Basement Health Club",
+        "description": "Online κρατήσεις και υπηρεσίες του Basement Health Club.",
+        "image": "/basement-logo.jpeg"
+      },
+      "sections": [
+        {
+          "id": "hero",
+          "type": "hero",
+          "title": "Προπόνηση με",
+          "body": "Μικρά group, προσωπική επίβλεψη και διαφορετικοί τρόποι προπόνησης σε έναν χώρο που σε γνωρίζει με το όνομά σου.",
+          "eyebrow": "BASEMENT HEALTH CLUB · ΠΕΤΡΟΥΠΟΛΗ",
+          "accent": "καθοδήγηση.",
+          "hidden": false,
+          "buttons": [
+            {
+              "id": "b61d929f-4ecc-4fdb-80c4-00a2f36ca742",
+              "label": "Γνώρισε τις υπηρεσίες →",
+              "url": "#services",
+              "variant": "primary",
+              "position": "left",
+              "fontSize": 0,
+              "padding": 0,
+              "width": 0
+            },
+            {
+              "id": "2700aeeb-81ed-4246-a489-0fd377a40d4e",
+              "label": "Κάλεσέ μας",
+              "url": "tel:+306983389353",
+              "variant": "primary",
+              "position": "left",
+              "fontSize": 0,
+              "padding": 0,
+              "width": 0
+            }
+          ],
+          "media": [
+            {
+              "id": "logo",
+              "url": "/basement-logo.jpeg",
+              "type": "image",
+              "alt": "Basement Health Club",
+              "fit": "cover",
+              "position": "50% 50%"
+            }
+          ],
+          "items": [
+            {
+              "id": "caption",
+              "title": "Ι. Ξενίδη 5 · Πετρούπολη"
+            }
+          ],
+          "style": {
+            "background": "",
+            "color": "",
+            "align": "left",
+            "padding": 0,
+            "fontSize": 0,
+            "columns": 0,
+            "maxWidth": 0
+          }
+        },
+        {
+          "id": "strip",
+          "type": "strip",
+          "title": "EST. 2015",
+          "body": "",
+          "eyebrow": "",
+          "accent": "",
+          "hidden": false,
+          "buttons": [],
+          "media": [],
+          "items": [
+            {
+              "id": "strip-0",
+              "title": "Μικρά group"
+            },
+            {
+              "id": "strip-1",
+              "title": "Προσωπική καθοδήγηση"
+            },
+            {
+              "id": "strip-2",
+              "title": "Πολλαπλές υπηρεσίες"
+            }
+          ],
+          "style": {
+            "background": "",
+            "color": "",
+            "align": "left",
+            "padding": 0,
+            "fontSize": 0,
+            "columns": 0,
+            "maxWidth": 0
+          }
+        },
+        {
+          "id": "services",
+          "type": "services",
+          "title": "Βρες αυτό που ταιριάζει στον στόχο σου",
+          "body": "Δες τι είναι κάθε υπηρεσία και τι μπορεί να σου προσφέρει. Η ομάδα του Basement σε βοηθά να επιλέξεις με βάση το επίπεδο και τον στόχο σου.",
+          "eyebrow": "ΟΙ ΥΠΗΡΕΣΙΕΣ ΜΑΣ",
+          "accent": "",
+          "hidden": false,
+          "buttons": [],
+          "media": [],
+          "items": [],
+          "style": {
+            "background": "",
+            "color": "",
+            "align": "left",
+            "padding": 0,
+            "fontSize": 0,
+            "columns": 0,
+            "maxWidth": 0
+          }
+        },
+        {
+          "id": "reviews",
+          "type": "reviews",
+          "title": "Τι λένε τα μέλη μας",
+          "body": "",
+          "eyebrow": "ΑΞΙΟΛΟΓΗΣΕΙΣ",
+          "accent": "5.0",
+          "hidden": false,
+          "buttons": [
+            {
+              "id": "820a0653-d4a3-476f-8e4e-88337b59c842",
+              "label": "Δες όλες τις αξιολογήσεις",
+              "url": "https://www.google.com/maps/search/?api=1&query=THE%20BASEMENT%20HEALTH%20CLUB%20Petroupoli",
+              "variant": "primary",
+              "position": "left",
+              "fontSize": 0,
+              "padding": 0,
+              "width": 0
+            },
+            {
+              "id": "9709e8bb-783a-4ba8-973f-d7c4bdecc289",
+              "label": "Γράψε αξιολόγηση →",
+              "url": "https://www.google.com/maps/search/?api=1&query=THE%20BASEMENT%20HEALTH%20CLUB%20Petroupoli",
+              "variant": "primary",
+              "position": "left",
+              "fontSize": 0,
+              "padding": 0,
+              "width": 0
+            }
+          ],
+          "media": [],
+          "items": [
+            {
+              "id": "review-0",
+              "title": "Βασιλική",
+              "body": "Πολύ καθαρός χώρος, φιλικό και καταρτισμένο προσωπικό.",
+              "tag": "Google"
+            },
+            {
+              "id": "review-1",
+              "title": "Μαρία",
+              "body": "Φιλικό περιβάλλον και σωστή δουλειά στα EMS groups.",
+              "tag": "Google"
+            },
+            {
+              "id": "review-2",
+              "title": "Φρύνη",
+              "body": "Οι γυμναστές δείχνουν ενδιαφέρον, δίνουν σωστές οδηγίες και σε κάνουν να νιώθεις άνετα.",
+              "tag": "Google"
+            }
+          ],
+          "style": {
+            "background": "",
+            "color": "",
+            "align": "left",
+            "padding": 0,
+            "fontSize": 0,
+            "columns": 0,
+            "maxWidth": 0
+          }
+        },
+        {
+          "id": "contact",
+          "type": "contact",
+          "title": "BASEMENT HEALTH CLUB",
+          "body": "",
+          "eyebrow": "ΒΡΕΣ ΜΑΣ",
+          "accent": "",
+          "hidden": false,
+          "buttons": [],
+          "media": [],
+          "items": [],
+          "style": {
+            "background": "",
+            "color": "",
+            "align": "left",
+            "padding": 0,
+            "fontSize": 0,
+            "columns": 0,
+            "maxWidth": 0
+          }
+        },
+        {
+          "id": "portal",
+          "type": "bookup",
+          "title": "Οι κρατήσεις σου σε ένα σημείο.",
+          "body": "Κλείσε και διαχειρίσου τα ραντεβού σου στην εφαρμογή Basement Health Club ή στη διαδικτυακή πλατφόρμα Bookup.",
+          "eyebrow": "ΓΙΑ ΤΑ ΜΕΛΗ",
+          "accent": "",
+          "hidden": false,
+          "buttons": [],
+          "media": [],
+          "items": [],
+          "style": {
+            "background": "",
+            "color": "",
+            "align": "left",
+            "padding": 0,
+            "fontSize": 0,
+            "columns": 0,
+            "maxWidth": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-0",
+      "slug": "services/cross-training",
+      "title": "Cross Training",
+      "visible": true,
+      "serviceId": "service-0",
+      "seo": {
+        "title": "Cross Training | Basement Health Club",
+        "description": "Ομαδική λειτουργική προπόνηση με βάρη, ασκήσεις ενδυνάμωσης και conditioning, με καθοδήγηση προπονητή.",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "service-1",
+      "slug": "services/ems-training",
+      "title": "EMS Training",
+      "visible": true,
+      "serviceId": "service-1",
+      "seo": {
+        "title": "EMS Training | Basement Health Club",
+        "description": "Προπόνηση με ηλεκτρομυοδιέγερση και ταυτόχρονη εκτέλεση ασκήσεων, σε μικρά group έως 3 ατόμων.",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "service-2",
+      "slug": "services/personal-training",
+      "title": "Personal Training",
+      "visible": true,
+      "serviceId": "service-2",
+      "seo": {
+        "title": "Personal Training | Basement Health Club",
+        "description": "Ατομικό πρόγραμμα προπόνησης σχεδιασμένο γύρω από τον στόχο, το επίπεδο και την πρόοδό σου.",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "service-3",
+      "slug": "services/boxing-kick-boxing",
+      "title": "Boxing / Kick Boxing",
+      "visible": true,
+      "serviceId": "service-3",
+      "seo": {
+        "title": "Boxing / Kick Boxing | Basement Health Club",
+        "description": "Προπόνηση τεχνικής πυγμαχίας και kick boxing με έμφαση στον συντονισμό, την αντοχή και τη φυσική κατάσταση.",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "service-4",
+      "slug": "services/vacu-power",
+      "title": "Vacu Power",
+      "visible": true,
+      "serviceId": "service-4",
+      "seo": {
+        "title": "Vacu Power | Basement Health Club",
+        "description": "Αερόβια άσκηση σε ειδικό μηχάνημα Vacu Power, ως συμπληρωματική επιλογή στο πρόγραμμα άσκησής σου.",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "service-5",
+      "slug": "services/ems-sculpting",
+      "title": "EMS Sculpting",
+      "visible": true,
+      "serviceId": "service-5",
+      "seo": {
+        "title": "EMS Sculpting | Basement Health Club",
+        "description": "Συνεδρία μυϊκής διέγερσης HIFEM για επιλεγμένες περιοχές, ως συμπληρωματική υπηρεσία και όχι υποκατάστατο άσκησης.",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "ultratech-ems",
+      "slug": "services/ultratech-ems",
+      "title": "UltraTech EMS",
+      "visible": true,
+      "serviceId": "ultratech-ems",
+      "seo": {
+        "title": "UltraTech EMS | Basement Health Club",
+        "description": "",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "vibrosauna",
+      "slug": "services/vibrosauna",
+      "title": "Vibrosauna",
+      "visible": true,
+      "serviceId": "vibrosauna",
+      "seo": {
+        "title": "Vibrosauna | Basement Health Club",
+        "description": "",
+        "image": ""
+      },
+      "sections": []
+    },
+    {
+      "id": "diatrofi",
+      "slug": "services/diatrofi",
+      "title": "Διατροφή",
+      "visible": true,
+      "serviceId": "diatrofi",
+      "seo": {
+        "title": "Διατροφή | Basement Health Club",
+        "description": "",
+        "image": ""
+      },
+      "sections": []
+    }
+  ],
+  "services": [
+    {
+      "id": "service-0",
+      "slug": "cross-training",
+      "title": "Cross Training",
+      "tag": "Δύναμη · αντοχή · ομάδα",
+      "body": "Ομαδική λειτουργική προπόνηση με βάρη, ασκήσεις ενδυνάμωσης και conditioning, με καθοδήγηση προπονητή.",
+      "bullets": [
+        "Βελτίωση δύναμης και φυσικής κατάστασης",
+        "Μικρά τμήματα και επίβλεψη",
+        "Ποικιλία στην προπόνηση"
+      ],
+      "media": [],
+      "buttons": [],
+      "visible": true,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "service-1",
+      "slug": "ems-training",
+      "title": "EMS Training",
+      "tag": "Ολόσωμη ηλεκτρομυοδιέγερση",
+      "body": "Προπόνηση με ηλεκτρομυοδιέγερση και ταυτόχρονη εκτέλεση ασκήσεων, σε μικρά group έως 3 ατόμων.",
+      "bullets": [
+        "Σύντομη και οργανωμένη συνεδρία",
+        "Ελεγχόμενη ένταση ανά μυϊκή ομάδα",
+        "Προσωπική καθοδήγηση"
+      ],
+      "media": [],
+      "buttons": [],
+      "visible": true,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "service-2",
+      "slug": "personal-training",
+      "title": "Personal Training",
+      "tag": "1 προς 1 προπόνηση",
+      "body": "Ατομικό πρόγραμμα προπόνησης σχεδιασμένο γύρω από τον στόχο, το επίπεδο και την πρόοδό σου.",
+      "bullets": [
+        "100% προσωπική επίβλεψη",
+        "Πρόγραμμα προσαρμοσμένο σε εσένα",
+        "Συστηματική παρακολούθηση προόδου"
+      ],
+      "media": [],
+      "buttons": [],
+      "visible": true,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "service-3",
+      "slug": "boxing-kick-boxing",
+      "title": "Boxing / Kick Boxing",
+      "tag": "Τεχνική · φυσική κατάσταση",
+      "body": "Προπόνηση τεχνικής πυγμαχίας και kick boxing με έμφαση στον συντονισμό, την αντοχή και τη φυσική κατάσταση.",
+      "bullets": [
+        "Cardio και αντοχή",
+        "Συντονισμός και τεχνική",
+        "Δυναμική προπόνηση"
+      ],
+      "media": [],
+      "buttons": [],
+      "visible": true,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "service-4",
+      "slug": "vacu-power",
+      "title": "Vacu Power",
+      "tag": "Cardio σε ειδικό εξοπλισμό",
+      "body": "Αερόβια άσκηση σε ειδικό μηχάνημα Vacu Power, ως συμπληρωματική επιλογή στο πρόγραμμα άσκησής σου.",
+      "bullets": [
+        "Αερόβια δραστηριότητα",
+        "Εύκολη ένταξη στο εβδομαδιαίο πρόγραμμα",
+        "Καθοδηγούμενη χρήση"
+      ],
+      "media": [],
+      "buttons": [],
+      "visible": true,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "service-5",
+      "slug": "ems-sculpting",
+      "title": "EMS Sculpting",
+      "tag": "HIFEM μυϊκή διέγερση",
+      "body": "Συνεδρία μυϊκής διέγερσης HIFEM για επιλεγμένες περιοχές, ως συμπληρωματική υπηρεσία και όχι υποκατάστατο άσκησης.",
+      "bullets": [
+        "Στοχευμένη εφαρμογή",
+        "Μη επεμβατική συνεδρία",
+        "Συνδυάζεται με πρόγραμμα άσκησης"
+      ],
+      "media": [],
+      "buttons": [],
+      "visible": true,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "ultratech-ems",
+      "slug": "ultratech-ems",
+      "title": "UltraTech EMS",
+      "tag": "",
+      "body": "",
+      "bullets": [],
+      "media": [],
+      "buttons": [],
+      "visible": false,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "vibrosauna",
+      "slug": "vibrosauna",
+      "title": "Vibrosauna",
+      "tag": "",
+      "body": "",
+      "bullets": [],
+      "media": [],
+      "buttons": [],
+      "visible": false,
+      "price": "",
+      "offer": ""
+    },
+    {
+      "id": "diatrofi",
+      "slug": "diatrofi",
+      "title": "Διατροφή",
+      "tag": "",
+      "body": "",
+      "bullets": [],
+      "media": [],
+      "buttons": [],
+      "visible": false,
+      "price": "",
+      "offer": ""
+    }
+  ],
+  "offers": [],
+  "media": [
+    {
+      "id": "logo",
+      "url": "/basement-logo.jpeg",
+      "type": "image",
+      "alt": "Basement Health Club",
+      "fit": "cover",
+      "position": "50% 50%"
+    }
+  ]
+}
