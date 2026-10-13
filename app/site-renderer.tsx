@@ -2,8 +2,6 @@
 import type {CSSProperties,ReactNode} from 'react';
 import type {SiteDocument,Page,Section,Media,Button,Item} from '../lib/site/model';
 import {safeUrl,embedUrl,offerActive} from '../lib/site/model';
-import HomeLogin from './home-login';
-import AppInstall from './app-install';
 import PublicSiteDynamic from './public-site-dynamic';
 import './site-content.css';
 type Props={document:SiteDocument;page:Page;onEdit?:(path:string)=>void;mediaUrls?:Record<string,string>;preview?:boolean};
@@ -30,7 +28,7 @@ export default function SiteRenderer({document:d,page,onEdit,mediaUrls={},previe
  default:return wrap(<><span className="kicker" {...edit(p+'.eyebrow')}>{s.eyebrow}</span><h2 style={{fontSize:s.style.fontSize||undefined}} {...edit(p+'.title')}>{s.title}</h2><p className="site-body" {...edit(p+'.body')}>{s.body}</p>{s.media.map((m,j)=>media(m,p+'.media.'+j))}{s.items.map((item,j)=><article key={item.id}><h3 {...edit(p+'.items.'+j+'.title')}>{item.title}</h3><p {...edit(p+'.items.'+j+'.body')}>{item.body}</p></article>)}<div className="actions">{buttons(s.buttons,p+'.buttons')}</div></>,'gallery-section site-text');
  }};
  return <main className={`cms-public ${onEdit?'site-edit-mode':''}`} style={{'--site-accent':d.theme.accent,'--site-radius':d.theme.buttonRadius+'px',background:d.theme.background,color:d.theme.text,fontFamily:d.theme.font} as CSSProperties}>
- {page.slug===''&&!onEdit&&!preview&&<AppInstall/>}<nav><a className="brand" href="/"><img src={mediaUrls[d.branding.logo.id]||url(d.branding.logo.url)} width={62} height={62} alt={d.branding.logo.alt||'Basement Health Club'} {...edit('branding.logo')}/><span><b {...edit('branding.name')}>{d.branding.name}</b><small {...edit('branding.subtitle')}>{d.branding.subtitle}</small></span></a><div className="site-nav-links">{buttons(d.navigation,'navigation')}</div><div className="site-nav-actions">{booking()}<HomeLogin className="login" label="Σύνδεση μέλους"/><a className="site-admin-link" href="/admin/site">ΡΥΘΜΙΣΕΙΣ</a></div></nav>
+ <nav><a className="brand" href="/"><img src={mediaUrls[d.branding.logo.id]||url(d.branding.logo.url)} width={62} height={62} alt={d.branding.logo.alt||'Basement Health Club'} {...edit('branding.logo')}/><span><b {...edit('branding.name')}>{d.branding.name}</b><small {...edit('branding.subtitle')}>{d.branding.subtitle}</small></span></a><div className="site-nav-links">{buttons(d.navigation,'navigation')}</div><div className="site-nav-actions">{booking()}</div></nav>
  {page.serviceId&&<section className="services site-single-service"><span className="kicker">BASEMENT HEALTH CLUB</span>{d.services.filter(s=>s.id===page.serviceId).map((s,i)=>renderService(s,'services.'+d.services.indexOf(s),i))}{stores()}</section>}
  {page.sections.map(renderSection)}
  <footer className="site-footer"><div className="brand"><img src={mediaUrls[d.branding.logo.id]||url(d.branding.logo.url)} width={50} height={50} alt=""/><span><b {...edit('branding.name')}>{d.branding.name}</b><small {...edit('branding.footerSubtitle')}>{d.branding.footerSubtitle}</small></span></div><div className="site-footer-links">{buttons(d.footerLinks,'footerLinks')}</div><p {...edit('branding.copyright')}>{d.branding.copyright}</p></footer>
