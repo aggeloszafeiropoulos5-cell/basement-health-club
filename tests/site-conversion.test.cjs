@@ -6,7 +6,7 @@ test('Conversion migration preserves owner changes and adds complete public rout
  for(const p of d.pages.filter(p=>p.serviceId)){assert.ok(p.sections.some(s=>s.type==='lead'));assert.equal(p.sections[0].items.length,3);}
  d.pages[0].sections.find(s=>s.type==='hero').media[0].url='/owner.mp4';d.pages[0].sections.find(s=>s.type==='offers').hidden=true;d.leadCapture.stickyLabel='Μίλα μαζί μας';d.pages[1].sections=[];assert.deepEqual(upgradeSiteDesign(d),d);
  const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),Renderer=require('../app/site-renderer.tsx').default;
- let html=renderToStaticMarkup(React.createElement(Renderer,{document:d,page:d.pages[1]}));assert.match(html,/<h1[^>]*>Cross Training<\/h1>/);assert.match(html,/service=cross-training/);
+ let html=renderToStaticMarkup(React.createElement(Renderer,{document:d,page:d.pages[1]}));assert.match(html,/<h1[^>]*>Cross Training<\/h1>/);assert.ok(html.includes('href="'+d.bookup.url.replaceAll('&','&amp;')+'"'));assert.doesNotMatch(html,/Κλείσε δοκιμαστικό/);assert.ok(!html.slice(0,html.indexOf('</header>')).includes('site-social-button'));
  html=renderToStaticMarkup(React.createElement(Renderer,{document:d,page:d.pages[0]}));assert.match(html,/site-mobile-trial/);assert.doesNotMatch(html,/Δεν υπάρχουν ενεργές προσφορές/);assert.match(html,/Πηγή αξιολόγησης/);
 });
 test('Only valid services and active offers enter the CRM payload; source context is bounded',()=>{

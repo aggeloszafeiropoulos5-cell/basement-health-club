@@ -22,3 +22,10 @@ export function upgradeNavigation(d:SiteDocument){
  d.navigation=[{id:'nav-home-60',label:'Αρχική',url:'/'},...serviceLinks,...extra,{id:'nav-contact-60',label:'Επικοινωνία',url:'/#contact'}];
  d.navigationVersion=60;return d;
 }
+
+export function upgradeBookingLinks(d:SiteDocument){
+ if(d.bookingVersion===61)return d;
+ d.bookup.label='Κλείσε ραντεβού';
+ if(d.leadCapture)d.leadCapture.stickyLabel='Κλείσε ραντεβού';
+ d.bookingVersion=61;return d;
+}
