@@ -1,5 +1,6 @@
 import type {SiteDocument,Section} from './model';
 import {serviceCopy} from './service-copy';
+import {upgradeConversion} from './conversion';
 
 /** Editable defaults applied once; subsequent owner edits and removals take priority. */
 function upgradeLayout(input:SiteDocument):SiteDocument {
@@ -42,7 +43,7 @@ function upgradeLayout(input:SiteDocument):SiteDocument {
 /** Same content migration is used by the public page and the owner editor. */
 export function upgradeSiteDesign(input:SiteDocument):SiteDocument{
  const d=upgradeLayout(input);
- if(d.contentVersion===58)return d;
+ if(d.contentVersion===58)return upgradeConversion(d);
  for(const item of d.services){const copy=serviceCopy[item.slug||''];if(copy)Object.assign(item,structuredClone(copy));}
  const clean=(value:string)=>value.replace(/[↗↘↙↖→←↑↓➡⬅⬆⬇↔↕]/gu,'').replace(/\ufe0f/gu,'').trim();
  const cleanButtons=(buttons:{label:string}[])=>buttons.forEach(b=>b.label=clean(b.label));
@@ -51,5 +52,5 @@ export function upgradeSiteDesign(input:SiteDocument):SiteDocument{
   if(page.serviceId){const service=d.services.find(s=>s.id===page.serviceId);if(service?.body)page.seo.description=service.body;}
  }
  d.services.forEach(s=>cleanButtons(s.buttons||[]));d.offers.forEach(o=>cleanButtons(o.buttons||[]));
- d.contentVersion=58;return d;
+ d.contentVersion=58;return upgradeConversion(d);
 }
