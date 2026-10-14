@@ -29,3 +29,10 @@ export function upgradeBookingLinks(d:SiteDocument){
  if(d.leadCapture)d.leadCapture.stickyLabel='Κλείσε ραντεβού';
  d.bookingVersion=61;return d;
 }
+
+export function upgradeSimpleHeader(d:SiteDocument){
+ if(d.headerVersion===62)return d;
+ for(const page of d.pages)page.sections=page.sections.filter(s=>s.type!=='lead');
+ if(d.leadCapture)d.leadCapture.enabled=false;
+ d.headerVersion=62;return d;
+}
