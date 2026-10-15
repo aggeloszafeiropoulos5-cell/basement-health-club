@@ -1,0 +1,13 @@
+export type TrainingAccess={member_id:string;training_type:'other'|'cross'|'weights';show_programs:boolean;show_measurements:boolean;show_nutrition:boolean};
+export type Exercise={id:string;name:string;sets:number;reps:string;rest_seconds:number;video_url:string;notes:string};
+export type WorkoutContent={notes:string;days:{id:string;title:string;exercises:Exercise[]}[]};
+export type WorkoutPlan={id:string;member_id:string;title:string;category:'cross'|'weights'|'ems'|'general';starts_on:string;ends_on:string|null;status:'draft'|'published'|'archived';content:WorkoutContent;revision:number;updated_at:string};
+export type ExerciseLog={id:string;member_id:string;plan_id:string;exercise_id:string;exercise_name:string;performed_on:string;set_number:number;weight_kg:number;reps:number;notes:string;created_at:string};
+export type BodyMeasurement={id:number;member_id:string;measured_on:string;weight_kg:number|null;body_fat_percent:number|null;waist_cm:number|null;hips_cm:number|null;chest_cm:number|null;thigh_cm:number|null;arm_cm:number|null;notes:string;created_by:string|null};
+export const defaultAccess=(member_id:string):TrainingAccess=>({member_id,training_type:'other',show_programs:true,show_measurements:true,show_nutrition:true});
+export const newExercise=():Exercise=>({id:crypto.randomUUID(),name:'',sets:3,reps:'10–12',rest_seconds:60,video_url:'',notes:''});
+export const newWorkout=():WorkoutContent=>({notes:'',days:[{id:crypto.randomUUID(),title:'Ημέρα 1',exercises:[newExercise()]}]});
+export const trainingLabels={other:'Άλλη υπηρεσία / χωρίς κιλά ασκήσεων',cross:'Cross Training',weights:'Βάρη / Personal με βάρη'};
+export const categoryLabels={cross:'Cross Training',weights:'Βάρη',ems:'EMS',general:'Γενικό πρόγραμμα'};
+export const bodyFields=[['weight_kg','Βάρος (kg)'],['body_fat_percent','Λίπος (%)'],['waist_cm','Μέση (cm)'],['hips_cm','Περιφέρεια (cm)'],['chest_cm','Στήθος (cm)'],['thigh_cm','Μηρός (cm)'],['arm_cm','Μπράτσο (cm)']] as const;
+export const workoutActive=(p:WorkoutPlan,day:string)=>p.status==='published'&&p.starts_on<=day&&(!p.ends_on||p.ends_on>=day);
